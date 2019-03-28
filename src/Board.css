@@ -1,0 +1,27 @@
+.board {
+  border-collapse: collapse;
+}
+
+.board-square {
+  width: 70px;
+  height: 70px;
+  padding: 0px;
+  margin: 0px;
+}
+
+.piece-square {
+  width: 70px;
+  height: 70px;
+}
+
+.piece-img {
+  margin: 5px;
+}
+
+.even-square {
+  background-color: rgb(238, 238, 210);
+}
+
+.odd-square {
+  background-color: rgb(118, 150, 86);
+}
