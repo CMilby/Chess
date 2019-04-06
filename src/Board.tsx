@@ -6,14 +6,27 @@ import "./Board.css";
 
 export interface IBoardProps {}
 
-export interface IBoardState {}
+export interface IBoardState {
+  board_squares: any[];
+}
 
 export default class Board extends Component<IBoardProps, IBoardState> {
   constructor(props: any) {
     super(props);
+
+    this.state = {
+      board_squares: []
+    };
+
+    for (let y = 0; y < 8; y++) {
+      this.state.board_squares[y] = [];
+      for (let x = 0; x < 8; x++) {
+        this.state.board_squares[y][x] = this.setupGame(x, y);
+      }
+    }
   }
 
-  makeSquare(x: number, y: number) {
+  setupGame(x: number, y: number) {
     let piece: string = "";
     if (y == 0) {
       if (x == 0) {
@@ -57,37 +70,47 @@ export default class Board extends Component<IBoardProps, IBoardState> {
       }
     }
 
+    return this.makeSquare(x, y, piece, false);
+  }
+
+  makeSquare(x: number, y: number, piece: string, has_moved: boolean) {
     return (
       <BoardSquare
         x={x}
         y={y}
         key={"board_square_" + x + "_" + y}
         piece_type={piece}
+        piece_has_moved={has_moved}
+        remove_piece_callback={this.removePiece.bind(this)}
+        add_piece_callback={this.setPiece.bind(this)}
+        board={this.state.board_squares}
       />
     );
   }
 
-  render() {
-    let boardSquares: any[] = [];
-    for (let y = 0; y < 8; y++) {
-      boardSquares[y] = [];
-      for (let x = 0; x < 8; x++) {
-        boardSquares[y][x] = this.makeSquare(x, y);
-      }
-    }
+  setPiece(x: number, y: number, piece: string) {
+    let boardSquares = this.state.board_squares;
+    boardSquares[y][x] = this.makeSquare(x, y, piece, true);
+    this.setState({ board_squares: boardSquares });
+  }
 
+  removePiece(x: number, y: number) {
+    this.setPiece(x, y, "");
+  }
+
+  render() {
     return (
       <div>
         <table className="board">
           <tbody>
-            <tr>{boardSquares[7]}</tr>
-            <tr>{boardSquares[6]}</tr>
-            <tr>{boardSquares[5]}</tr>
-            <tr>{boardSquares[4]}</tr>
-            <tr>{boardSquares[3]}</tr>
-            <tr>{boardSquares[2]}</tr>
-            <tr>{boardSquares[1]}</tr>
-            <tr>{boardSquares[0]}</tr>
+            <tr>{this.state.board_squares[7]}</tr>
+            <tr>{this.state.board_squares[6]}</tr>
+            <tr>{this.state.board_squares[5]}</tr>
+            <tr>{this.state.board_squares[4]}</tr>
+            <tr>{this.state.board_squares[3]}</tr>
+            <tr>{this.state.board_squares[2]}</tr>
+            <tr>{this.state.board_squares[1]}</tr>
+            <tr>{this.state.board_squares[0]}</tr>
           </tbody>
         </table>
       </div>
