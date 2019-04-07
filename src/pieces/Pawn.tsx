@@ -1,7 +1,38 @@
 import Piece from "../Piece";
 
 export default class Pawn extends Piece {
+  getCoveredSquares() {
+    let x = +this.props.x;
+    let y = +this.props.y;
+
+    let ret = [] as number[][];
+
+    if (this.props.piece_type.endsWith("light")) {
+      if (x - 1 >= 0) {
+        ret.push([x - 1, y + 1]);
+      }
+
+      if (x + 1 < 8) {
+        ret.push([x + 1, y + 1]);
+      }
+    } else if (this.props.piece_type.endsWith("dark")) {
+      if (x - 1 >= 0) {
+        ret.push([x - 1, y - 1]);
+      }
+
+      if (x + 1 < 8) {
+        ret.push([x + 1, y - 1]);
+      }
+    }
+
+    return ret;
+  }
+
   getAllMoves() {
+    return [] as number[][];
+  }
+
+  getPossibleMoves() {
     let x = +this.props.x;
     let y = +this.props.y;
 
@@ -65,10 +96,6 @@ export default class Pawn extends Piece {
     }
 
     return ret;
-  }
-
-  getPossibleMoves() {
-    return this.getAllMoves();
   }
 
   canPieceMove(toX: number, toY: number) {

@@ -12,6 +12,7 @@ export interface IPieceProps {
 
 export interface IPieceState {
   has_moved: boolean;
+  possible_moves: number[][];
 }
 
 export default class Piece extends Component<IPieceProps, IPieceState> {
@@ -19,26 +20,37 @@ export default class Piece extends Component<IPieceProps, IPieceState> {
     super(props);
 
     this.state = {
-      has_moved: this.props.has_moved
+      has_moved: this.props.has_moved,
+      possible_moves: []
     };
   }
 
-  onDragStart(e: any) {
-    let possibleMoves = this.getPossibleMoves();
+  recalculateCoveredSquares() {
+    return this.getCoveredSquares();
+  }
 
+  recalculatePossibleMoves() {
+    this.setState({ possible_moves: this.getPossibleMoves() });
+  }
+
+  onDragStart(e: any) {
     e.dataTransfer.effectAllowed = "move";
     e.dataTransfer.setData("text/x", e.target.getAttribute("data-x"));
     e.dataTransfer.setData("text/y", e.target.getAttribute("data-y"));
     e.dataTransfer.setData("text/piece", e.target.getAttribute("data-piece"));
-    e.dataTransfer.setData("text/moves", possibleMoves);
+    e.dataTransfer.setData("text/moves", this.state.possible_moves);
 
-    for (let i = 0; i < possibleMoves.length; i++) {
+    for (let i = 0; i < this.state.possible_moves.length; i++) {
       this.props.set_overlay_callback(
-        possibleMoves[i][0],
-        possibleMoves[i][1],
+        this.state.possible_moves[i][0],
+        this.state.possible_moves[i][1],
         true
       );
     }
+  }
+
+  getCoveredSquares() {
+    return [] as number[][];
   }
 
   getAllMoves() {

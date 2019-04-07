@@ -1,6 +1,10 @@
 import Piece from "../Piece";
 
 export default class Knight extends Piece {
+  getCoveredSquares() {
+    return this.getAllMoves();
+  }
+
   getAllMoves() {
     let x = +this.props.x;
     let y = +this.props.y;

@@ -17,24 +17,30 @@ export interface IBoardSquareProps {
   remove_piece_callback: any;
   add_piece_callback: any;
   set_overlay_callback: any;
+  calculate_moves_callback: any;
 
   board: any[];
 }
 
 export interface IBoardSquareState {
   show_overlay: boolean;
+  pieces_covering_square: string[];
 }
 
 export default class BoardSquare extends Component<
   IBoardSquareProps,
   IBoardSquareState
 > {
+  private pieceRef: React.RefObject<any>;
   constructor(props: any) {
     super(props);
 
     this.state = {
-      show_overlay: false
+      show_overlay: false,
+      pieces_covering_square: []
     };
+
+    this.pieceRef = React.createRef();
   }
 
   onDragOver(e: any) {
@@ -67,8 +73,8 @@ export default class BoardSquare extends Component<
     }
 
     if (isValid) {
-      this.props.remove_piece_callback(oldX, oldY);
-      this.props.add_piece_callback(this.props.x, this.props.y, piece);
+      this.props.remove_piece_callback(oldX, oldY, false);
+      this.props.add_piece_callback(this.props.x, this.props.y, piece, true);
     }
   }
 
@@ -82,6 +88,7 @@ export default class BoardSquare extends Component<
           has_moved={this.props.piece_has_moved}
           board={this.props.board}
           set_overlay_callback={this.props.set_overlay_callback}
+          ref={this.pieceRef}
         />
       );
     } else if (piece_type.startsWith("rook")) {
@@ -93,6 +100,7 @@ export default class BoardSquare extends Component<
           has_moved={this.props.piece_has_moved}
           board={this.props.board}
           set_overlay_callback={this.props.set_overlay_callback}
+          ref={this.pieceRef}
         />
       );
     } else if (piece_type.startsWith("pawn")) {
@@ -104,6 +112,7 @@ export default class BoardSquare extends Component<
           has_moved={this.props.piece_has_moved}
           board={this.props.board}
           set_overlay_callback={this.props.set_overlay_callback}
+          ref={this.pieceRef}
         />
       );
     } else if (piece_type.startsWith("bishop")) {
@@ -115,6 +124,7 @@ export default class BoardSquare extends Component<
           has_moved={this.props.piece_has_moved}
           board={this.props.board}
           set_overlay_callback={this.props.set_overlay_callback}
+          ref={this.pieceRef}
         />
       );
     }
@@ -127,12 +137,35 @@ export default class BoardSquare extends Component<
         has_moved={this.props.piece_has_moved}
         board={this.props.board}
         set_overlay_callback={this.props.set_overlay_callback}
+        ref={this.pieceRef}
       />
     );
   }
 
   setOverlay(show: boolean) {
     this.setState({ show_overlay: show });
+  }
+
+  calculateMoves() {
+    this.pieceRef.current.recalculatePossibleMoves();
+  }
+
+  calculateCoveredSquares() {
+    return this.pieceRef.current.recalculateCoveredSquares();
+  }
+
+  clearPieceCoveringSquares() {
+    this.setState({ pieces_covering_square: [] });
+  }
+
+  addPieceCoveringSquare(piece: string) {
+    this.setState({
+      pieces_covering_square: [...this.state.pieces_covering_square, piece]
+    });
+  }
+
+  setPiecesCoveringSquares(pieces: string[]) {
+    this.setState({ pieces_covering_square: pieces });
   }
 
   render() {
