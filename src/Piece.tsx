@@ -6,6 +6,7 @@ export interface IPieceProps {
   x: number;
   y: number;
 
+  set_overlay_callback: any;
   board: any[];
 }
 
@@ -31,7 +32,13 @@ export default class Piece extends Component<IPieceProps, IPieceState> {
     e.dataTransfer.setData("text/piece", e.target.getAttribute("data-piece"));
     e.dataTransfer.setData("text/moves", possibleMoves);
 
-    console.log(possibleMoves);
+    for (let i = 0; i < possibleMoves.length; i++) {
+      this.props.set_overlay_callback(
+        possibleMoves[i][0],
+        possibleMoves[i][1],
+        true
+      );
+    }
   }
 
   getAllMoves() {

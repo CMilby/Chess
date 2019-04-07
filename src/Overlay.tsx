@@ -2,6 +2,8 @@ import React from "react";
 
 export interface IOverlayProps {
   color: string;
+  x: number;
+  y: number;
 }
 
 export interface IOverlayState {}
@@ -11,14 +13,17 @@ export default class Overlay extends React.Component<
   IOverlayState
 > {
   render() {
+    let top = (7 - this.props.y) * 70 + 25;
+    let left = this.props.x * 70 + 25;
     return (
       <div
         style={{
           position: "absolute",
-          top: 0,
-          left: 0,
-          height: "100%",
-          width: "100%",
+          top: top,
+          left: left,
+          height: "20px",
+          width: "20px",
+          borderRadius: "10px",
           zIndex: 1,
           opacity: 0.5,
           backgroundColor: this.props.color

@@ -1,9 +1,12 @@
 import React, { Component } from "react";
 
-import Piece from "./Piece";
+import Overlay from "./Overlay";
 
+import Piece from "./Piece";
 import Knight from "./pieces/Knight";
 import Rook from "./pieces/Rook";
+import Pawn from "./pieces/Pawn";
+import Bishop from "./pieces/Bishop";
 
 export interface IBoardSquareProps {
   x: number;
@@ -13,12 +16,13 @@ export interface IBoardSquareProps {
 
   remove_piece_callback: any;
   add_piece_callback: any;
+  set_overlay_callback: any;
 
   board: any[];
 }
 
 export interface IBoardSquareState {
-  occupied: number;
+  show_overlay: boolean;
 }
 
 export default class BoardSquare extends Component<
@@ -29,7 +33,7 @@ export default class BoardSquare extends Component<
     super(props);
 
     this.state = {
-      occupied: 0
+      show_overlay: false
     };
   }
 
@@ -44,8 +48,14 @@ export default class BoardSquare extends Component<
 
     let moves = e.dataTransfer.getData("text/moves").split(",");
     let movePairs = [] as number[][];
+
     for (let i = 0; i < moves.length; i += 2) {
+      if (moves.length == 1) {
+        break;
+      }
+
       movePairs.push([moves[i + 0], moves[i + 1]]);
+      this.props.set_overlay_callback(moves[i + 0], moves[i + 1], false);
     }
 
     let isValid = false;
@@ -71,6 +81,7 @@ export default class BoardSquare extends Component<
           y={this.props.y}
           has_moved={this.props.piece_has_moved}
           board={this.props.board}
+          set_overlay_callback={this.props.set_overlay_callback}
         />
       );
     } else if (piece_type.startsWith("rook")) {
@@ -81,6 +92,29 @@ export default class BoardSquare extends Component<
           y={this.props.y}
           has_moved={this.props.piece_has_moved}
           board={this.props.board}
+          set_overlay_callback={this.props.set_overlay_callback}
+        />
+      );
+    } else if (piece_type.startsWith("pawn")) {
+      return (
+        <Pawn
+          piece_type={piece_type}
+          x={this.props.x}
+          y={this.props.y}
+          has_moved={this.props.piece_has_moved}
+          board={this.props.board}
+          set_overlay_callback={this.props.set_overlay_callback}
+        />
+      );
+    } else if (piece_type.startsWith("bishop")) {
+      return (
+        <Bishop
+          piece_type={piece_type}
+          x={this.props.x}
+          y={this.props.y}
+          has_moved={this.props.piece_has_moved}
+          board={this.props.board}
+          set_overlay_callback={this.props.set_overlay_callback}
         />
       );
     }
@@ -92,8 +126,13 @@ export default class BoardSquare extends Component<
         y={this.props.y}
         has_moved={this.props.piece_has_moved}
         board={this.props.board}
+        set_overlay_callback={this.props.set_overlay_callback}
       />
     );
+  }
+
+  setOverlay(show: boolean) {
+    this.setState({ show_overlay: show });
   }
 
   render() {
@@ -107,6 +146,11 @@ export default class BoardSquare extends Component<
       classes += "odd-square";
     }
 
+    let overlay = <div />;
+    if (this.state.show_overlay) {
+      overlay = <Overlay color="green" x={this.props.x} y={this.props.y} />;
+    }
+
     return (
       <td
         className={classes}
@@ -114,7 +158,8 @@ export default class BoardSquare extends Component<
         onDragOver={e => this.onDragOver(e)}
         onDrop={e => this.onDrop(e)}
       >
-        {this.getPiece(this.props.piece_type)}
+        <div>{overlay}</div>
+        <div>{this.getPiece(this.props.piece_type)}</div>
       </td>
     );
   }

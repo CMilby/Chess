@@ -11,6 +11,7 @@ export interface IBoardState {
 }
 
 export default class Board extends Component<IBoardProps, IBoardState> {
+  private boardRefs: React.RefObject<any>[][];
   constructor(props: any) {
     super(props);
 
@@ -18,9 +19,12 @@ export default class Board extends Component<IBoardProps, IBoardState> {
       board_squares: []
     };
 
+    this.boardRefs = [];
     for (let y = 0; y < 8; y++) {
       this.state.board_squares[y] = [];
+      this.boardRefs[y] = [];
       for (let x = 0; x < 8; x++) {
+        this.boardRefs[y][x] = React.createRef();
         this.state.board_squares[y][x] = this.setupGame(x, y);
       }
     }
@@ -83,9 +87,15 @@ export default class Board extends Component<IBoardProps, IBoardState> {
         piece_has_moved={has_moved}
         remove_piece_callback={this.removePiece.bind(this)}
         add_piece_callback={this.setPiece.bind(this)}
+        set_overlay_callback={this.setOverlay.bind(this)}
         board={this.state.board_squares}
+        ref={this.boardRefs[y][x]}
       />
     );
+  }
+
+  setOverlay(x: number, y: number, show: boolean) {
+    this.boardRefs[y][x].current.setOverlay(show);
   }
 
   setPiece(x: number, y: number, piece: string) {
