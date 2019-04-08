@@ -7,6 +7,8 @@ import Knight from "./pieces/Knight";
 import Rook from "./pieces/Rook";
 import Pawn from "./pieces/Pawn";
 import Bishop from "./pieces/Bishop";
+import Queen from "./pieces/Queen";
+import King from "./pieces/King";
 
 export interface IBoardSquareProps {
   x: number;
@@ -17,14 +19,13 @@ export interface IBoardSquareProps {
   remove_piece_callback: any;
   add_piece_callback: any;
   set_overlay_callback: any;
-  calculate_moves_callback: any;
 
-  board: any[];
+  board: string[][];
+  covered_squares: string[][][];
 }
 
 export interface IBoardSquareState {
   show_overlay: boolean;
-  pieces_covering_square: string[];
 }
 
 export default class BoardSquare extends Component<
@@ -36,8 +37,7 @@ export default class BoardSquare extends Component<
     super(props);
 
     this.state = {
-      show_overlay: false,
-      pieces_covering_square: []
+      show_overlay: false
     };
 
     this.pieceRef = React.createRef();
@@ -87,6 +87,7 @@ export default class BoardSquare extends Component<
           y={this.props.y}
           has_moved={this.props.piece_has_moved}
           board={this.props.board}
+          covered_squares={this.props.covered_squares}
           set_overlay_callback={this.props.set_overlay_callback}
           ref={this.pieceRef}
         />
@@ -99,6 +100,7 @@ export default class BoardSquare extends Component<
           y={this.props.y}
           has_moved={this.props.piece_has_moved}
           board={this.props.board}
+          covered_squares={this.props.covered_squares}
           set_overlay_callback={this.props.set_overlay_callback}
           ref={this.pieceRef}
         />
@@ -111,6 +113,7 @@ export default class BoardSquare extends Component<
           y={this.props.y}
           has_moved={this.props.piece_has_moved}
           board={this.props.board}
+          covered_squares={this.props.covered_squares}
           set_overlay_callback={this.props.set_overlay_callback}
           ref={this.pieceRef}
         />
@@ -123,6 +126,33 @@ export default class BoardSquare extends Component<
           y={this.props.y}
           has_moved={this.props.piece_has_moved}
           board={this.props.board}
+          covered_squares={this.props.covered_squares}
+          set_overlay_callback={this.props.set_overlay_callback}
+          ref={this.pieceRef}
+        />
+      );
+    } else if (piece_type.startsWith("queen")) {
+      return (
+        <Queen
+          piece_type={piece_type}
+          x={this.props.x}
+          y={this.props.y}
+          has_moved={this.props.piece_has_moved}
+          board={this.props.board}
+          covered_squares={this.props.covered_squares}
+          set_overlay_callback={this.props.set_overlay_callback}
+          ref={this.pieceRef}
+        />
+      );
+    } else if (piece_type.startsWith("king")) {
+      return (
+        <King
+          piece_type={piece_type}
+          x={this.props.x}
+          y={this.props.y}
+          has_moved={this.props.piece_has_moved}
+          board={this.props.board}
+          covered_squares={this.props.covered_squares}
           set_overlay_callback={this.props.set_overlay_callback}
           ref={this.pieceRef}
         />
@@ -136,6 +166,7 @@ export default class BoardSquare extends Component<
         y={this.props.y}
         has_moved={this.props.piece_has_moved}
         board={this.props.board}
+        covered_squares={this.props.covered_squares}
         set_overlay_callback={this.props.set_overlay_callback}
         ref={this.pieceRef}
       />
@@ -152,20 +183,6 @@ export default class BoardSquare extends Component<
 
   calculateCoveredSquares() {
     return this.pieceRef.current.recalculateCoveredSquares();
-  }
-
-  clearPieceCoveringSquares() {
-    this.setState({ pieces_covering_square: [] });
-  }
-
-  addPieceCoveringSquare(piece: string) {
-    this.setState({
-      pieces_covering_square: [...this.state.pieces_covering_square, piece]
-    });
-  }
-
-  setPiecesCoveringSquares(pieces: string[]) {
-    this.setState({ pieces_covering_square: pieces });
   }
 
   render() {

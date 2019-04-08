@@ -152,7 +152,7 @@ export default class Rook extends Piece {
   }
 
   canPieceMove(toX: number, toY: number) {
-    let pieceType = this.props.board[toY][toX].props.piece_type;
+    let pieceType = this.props.board[toY][toX];
 
     if (pieceType == "") {
       return 1;

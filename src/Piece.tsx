@@ -7,7 +7,9 @@ export interface IPieceProps {
   y: number;
 
   set_overlay_callback: any;
-  board: any[];
+
+  board: string[][];
+  covered_squares: string[][][];
 }
 
 export interface IPieceState {
@@ -30,7 +32,13 @@ export default class Piece extends Component<IPieceProps, IPieceState> {
   }
 
   recalculatePossibleMoves() {
-    this.setState({ possible_moves: this.getPossibleMoves() });
+    let possibleMoves = this.getPossibleMoves();
+    if (
+      JSON.stringify(possibleMoves) !==
+      JSON.stringify(this.state.possible_moves)
+    ) {
+      this.setState({ possible_moves: possibleMoves });
+    }
   }
 
   onDragStart(e: any) {

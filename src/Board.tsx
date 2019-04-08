@@ -7,8 +7,8 @@ import "./Board.css";
 export interface IBoardProps {}
 
 export interface IBoardState {
-  board_squares: any[];
-  test: string;
+  board: string[][];
+  covered_squares: string[][][];
 }
 
 export default class Board extends Component<IBoardProps, IBoardState> {
@@ -17,22 +17,27 @@ export default class Board extends Component<IBoardProps, IBoardState> {
     super(props);
 
     this.state = {
-      board_squares: [],
-      test: ""
+      board: [],
+      covered_squares: []
     };
 
     this.boardRefs = [];
     for (let y = 0; y < 8; y++) {
-      this.state.board_squares[y] = [];
+      this.state.board[y] = [];
       this.boardRefs[y] = [];
+
       for (let x = 0; x < 8; x++) {
         this.boardRefs[y][x] = React.createRef();
-        this.state.board_squares[y][x] = this.setupGame(x, y);
+        this.state.board[y][x] = this.setupGame(x, y);
       }
     }
   }
 
   componentDidMount() {
+    this.calculateAllMoves();
+  }
+
+  componentDidUpdate() {
     this.calculateAllMoves();
   }
 
@@ -46,7 +51,7 @@ export default class Board extends Component<IBoardProps, IBoardState> {
       } else if (x == 2) {
         piece = "bishop_light";
       } else if (x == 3) {
-        piece = "queen_light";
+        piece = "queen_dark";
       } else if (x == 4) {
         piece = "king_light";
       } else if (x == 5) {
@@ -80,7 +85,7 @@ export default class Board extends Component<IBoardProps, IBoardState> {
       }
     }
 
-    return this.makeSquare(x, y, piece, false);
+    return piece;
   }
 
   makeSquare(x: number, y: number, piece: string, has_moved: boolean) {
@@ -94,8 +99,8 @@ export default class Board extends Component<IBoardProps, IBoardState> {
         remove_piece_callback={this.removePiece.bind(this)}
         add_piece_callback={this.setPiece.bind(this)}
         set_overlay_callback={this.setOverlay.bind(this)}
-        calculate_moves_callback={this.calculateAllMoves.bind(this)}
-        board={this.state.board_squares}
+        board={this.state.board}
+        covered_squares={this.state.covered_squares}
         ref={this.boardRefs[y][x]}
       />
     );
@@ -106,13 +111,12 @@ export default class Board extends Component<IBoardProps, IBoardState> {
   }
 
   setPiece(x: number, y: number, piece: string, recalculate: boolean) {
-    let boardSquares = this.state.board_squares;
-    boardSquares[y][x] = this.makeSquare(x, y, piece, true);
+    let board = this.state.board;
+    board[y][x] = piece;
 
     let self = this;
-    this.setState({ board_squares: boardSquares }, function() {
+    this.setState({ board: board }, function() {
       if (recalculate) {
-        self.calculateAllMoves();
       }
     });
   }
@@ -127,7 +131,6 @@ export default class Board extends Component<IBoardProps, IBoardState> {
       states[y] = [];
       for (let x = 0; x < 8; x++) {
         states[y][x] = [];
-        this.boardRefs[y][x].current.clearPieceCoveringSquares();
       }
     }
 
@@ -139,37 +142,22 @@ export default class Board extends Component<IBoardProps, IBoardState> {
         ].current.calculateCoveredSquares();
 
         coveredSquares.map((i: any) => {
-          states[i[1]][i[0]].push(
-            this.state.board_squares[y][x].props.piece_type
-          );
+          states[i[1]][i[0]].push(this.state.board[y][x]);
         });
       }
     }
 
-    for (let y = 0; y < 8; y++) {
-      for (let x = 0; x < 8; x++) {
-        this.boardRefs[y][x].current.setPiecesCoveringSquares(states[y][x]);
-      }
+    if (JSON.stringify(states) !== JSON.stringify(this.state.covered_squares)) {
+      this.setState({ covered_squares: states });
     }
   }
 
-  testOnClick() {
-    this.setState({ test: "d" });
-  }
-
   render() {
+    let board = [] as any[][];
     for (let y = 0; y < 8; y++) {
+      board[y] = [];
       for (let x = 0; x < 8; x++) {
-        if (this.boardRefs[y][x].current != null) {
-          console.log(
-            "x: " +
-              x +
-              " | y: " +
-              y +
-              " | " +
-              this.boardRefs[y][x].current.state.pieces_covering_square
-          );
-        }
+        board[y][x] = this.makeSquare(x, y, this.state.board[y][x], false);
       }
     }
 
@@ -177,17 +165,16 @@ export default class Board extends Component<IBoardProps, IBoardState> {
       <div>
         <table className="board">
           <tbody>
-            <tr>{this.state.board_squares[7]}</tr>
-            <tr>{this.state.board_squares[6]}</tr>
-            <tr>{this.state.board_squares[5]}</tr>
-            <tr>{this.state.board_squares[4]}</tr>
-            <tr>{this.state.board_squares[3]}</tr>
-            <tr>{this.state.board_squares[2]}</tr>
-            <tr>{this.state.board_squares[1]}</tr>
-            <tr>{this.state.board_squares[0]}</tr>
+            <tr>{board[7]}</tr>
+            <tr>{board[6]}</tr>
+            <tr>{board[5]}</tr>
+            <tr>{board[4]}</tr>
+            <tr>{board[3]}</tr>
+            <tr>{board[2]}</tr>
+            <tr>{board[1]}</tr>
+            <tr>{board[0]}</tr>
           </tbody>
         </table>
-        <button onClick={this.testOnClick.bind(this)}>test</button>
       </div>
     );
   }
