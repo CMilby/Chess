@@ -21,6 +21,7 @@ export interface IBoardSquareProps {
   set_overlay_callback: any;
 
   board: string[][];
+  has_moved: boolean[][];
   covered_squares: string[][][];
 }
 
@@ -85,8 +86,9 @@ export default class BoardSquare extends Component<
           piece_type={piece_type}
           x={this.props.x}
           y={this.props.y}
-          has_moved={this.props.piece_has_moved}
+          has_moved_piece={this.props.piece_has_moved}
           board={this.props.board}
+          has_moved={this.props.has_moved}
           covered_squares={this.props.covered_squares}
           set_overlay_callback={this.props.set_overlay_callback}
           ref={this.pieceRef}
@@ -98,8 +100,9 @@ export default class BoardSquare extends Component<
           piece_type={piece_type}
           x={this.props.x}
           y={this.props.y}
-          has_moved={this.props.piece_has_moved}
+          has_moved_piece={this.props.piece_has_moved}
           board={this.props.board}
+          has_moved={this.props.has_moved}
           covered_squares={this.props.covered_squares}
           set_overlay_callback={this.props.set_overlay_callback}
           ref={this.pieceRef}
@@ -111,8 +114,9 @@ export default class BoardSquare extends Component<
           piece_type={piece_type}
           x={this.props.x}
           y={this.props.y}
-          has_moved={this.props.piece_has_moved}
+          has_moved_piece={this.props.piece_has_moved}
           board={this.props.board}
+          has_moved={this.props.has_moved}
           covered_squares={this.props.covered_squares}
           set_overlay_callback={this.props.set_overlay_callback}
           ref={this.pieceRef}
@@ -124,8 +128,9 @@ export default class BoardSquare extends Component<
           piece_type={piece_type}
           x={this.props.x}
           y={this.props.y}
-          has_moved={this.props.piece_has_moved}
+          has_moved_piece={this.props.piece_has_moved}
           board={this.props.board}
+          has_moved={this.props.has_moved}
           covered_squares={this.props.covered_squares}
           set_overlay_callback={this.props.set_overlay_callback}
           ref={this.pieceRef}
@@ -137,8 +142,9 @@ export default class BoardSquare extends Component<
           piece_type={piece_type}
           x={this.props.x}
           y={this.props.y}
-          has_moved={this.props.piece_has_moved}
+          has_moved_piece={this.props.piece_has_moved}
           board={this.props.board}
+          has_moved={this.props.has_moved}
           covered_squares={this.props.covered_squares}
           set_overlay_callback={this.props.set_overlay_callback}
           ref={this.pieceRef}
@@ -150,8 +156,9 @@ export default class BoardSquare extends Component<
           piece_type={piece_type}
           x={this.props.x}
           y={this.props.y}
-          has_moved={this.props.piece_has_moved}
+          has_moved_piece={this.props.piece_has_moved}
           board={this.props.board}
+          has_moved={this.props.has_moved}
           covered_squares={this.props.covered_squares}
           set_overlay_callback={this.props.set_overlay_callback}
           ref={this.pieceRef}
@@ -164,8 +171,9 @@ export default class BoardSquare extends Component<
         piece_type={piece_type}
         x={this.props.x}
         y={this.props.y}
-        has_moved={this.props.piece_has_moved}
+        has_moved_piece={this.props.piece_has_moved}
         board={this.props.board}
+        has_moved={this.props.has_moved}
         covered_squares={this.props.covered_squares}
         set_overlay_callback={this.props.set_overlay_callback}
         ref={this.pieceRef}

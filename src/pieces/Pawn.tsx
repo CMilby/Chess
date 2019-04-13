@@ -37,7 +37,7 @@ export default class Pawn extends Piece {
     let y = +this.props.y;
 
     let ret = [] as number[][];
-    if (!this.state.has_moved) {
+    if (!this.props.has_moved_piece) {
       if (
         this.props.piece_type.endsWith("light") &&
         this.props.board[y + 1][x] == "" &&

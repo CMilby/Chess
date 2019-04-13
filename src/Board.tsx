@@ -8,6 +8,7 @@ export interface IBoardProps {}
 
 export interface IBoardState {
   board: string[][];
+  has_moved: boolean[][];
   covered_squares: string[][][];
 }
 
@@ -18,15 +19,18 @@ export default class Board extends Component<IBoardProps, IBoardState> {
 
     this.state = {
       board: [],
+      has_moved: [],
       covered_squares: []
     };
 
     this.boardRefs = [];
     for (let y = 0; y < 8; y++) {
       this.state.board[y] = [];
+      this.state.has_moved[y] = [];
       this.boardRefs[y] = [];
 
       for (let x = 0; x < 8; x++) {
+        this.state.has_moved[y][x] = false;
         this.boardRefs[y][x] = React.createRef();
         this.state.board[y][x] = this.setupGame(x, y);
       }
@@ -51,7 +55,7 @@ export default class Board extends Component<IBoardProps, IBoardState> {
       } else if (x == 2) {
         piece = "bishop_light";
       } else if (x == 3) {
-        piece = "queen_dark";
+        piece = "queen_light";
       } else if (x == 4) {
         piece = "king_light";
       } else if (x == 5) {
@@ -100,6 +104,7 @@ export default class Board extends Component<IBoardProps, IBoardState> {
         add_piece_callback={this.setPiece.bind(this)}
         set_overlay_callback={this.setOverlay.bind(this)}
         board={this.state.board}
+        has_moved={this.state.has_moved}
         covered_squares={this.state.covered_squares}
         ref={this.boardRefs[y][x]}
       />
@@ -114,11 +119,10 @@ export default class Board extends Component<IBoardProps, IBoardState> {
     let board = this.state.board;
     board[y][x] = piece;
 
-    let self = this;
-    this.setState({ board: board }, function() {
-      if (recalculate) {
-      }
-    });
+    let hasMoved = this.state.has_moved;
+    hasMoved[y][x] = true;
+
+    this.setState({ board: board, has_moved: hasMoved });
   }
 
   removePiece(x: number, y: number, recalculate: boolean) {
@@ -157,7 +161,12 @@ export default class Board extends Component<IBoardProps, IBoardState> {
     for (let y = 0; y < 8; y++) {
       board[y] = [];
       for (let x = 0; x < 8; x++) {
-        board[y][x] = this.makeSquare(x, y, this.state.board[y][x], false);
+        board[y][x] = this.makeSquare(
+          x,
+          y,
+          this.state.board[y][x],
+          this.state.has_moved[y][x]
+        );
       }
     }
 

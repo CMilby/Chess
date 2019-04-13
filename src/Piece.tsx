@@ -2,18 +2,18 @@ import React, { Component } from "react";
 
 export interface IPieceProps {
   piece_type: string;
-  has_moved: boolean;
+  has_moved_piece: boolean;
   x: number;
   y: number;
 
   set_overlay_callback: any;
 
   board: string[][];
+  has_moved: boolean[][];
   covered_squares: string[][][];
 }
 
 export interface IPieceState {
-  has_moved: boolean;
   possible_moves: number[][];
 }
 
@@ -22,7 +22,6 @@ export default class Piece extends Component<IPieceProps, IPieceState> {
     super(props);
 
     this.state = {
-      has_moved: this.props.has_moved,
       possible_moves: []
     };
   }
