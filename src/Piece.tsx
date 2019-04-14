@@ -15,6 +15,7 @@ export interface IPieceProps {
 
 export interface IPieceState {
   possible_moves: number[][];
+  is_special_move: string[];
 }
 
 export default class Piece extends Component<IPieceProps, IPieceState> {
@@ -22,7 +23,8 @@ export default class Piece extends Component<IPieceProps, IPieceState> {
     super(props);
 
     this.state = {
-      possible_moves: []
+      possible_moves: [],
+      is_special_move: []
     };
   }
 
@@ -36,7 +38,10 @@ export default class Piece extends Component<IPieceProps, IPieceState> {
       JSON.stringify(possibleMoves) !==
       JSON.stringify(this.state.possible_moves)
     ) {
-      this.setState({ possible_moves: possibleMoves });
+      this.setState({
+        possible_moves: possibleMoves.moves,
+        is_special_move: possibleMoves.is_special
+      });
     }
   }
 
@@ -46,6 +51,7 @@ export default class Piece extends Component<IPieceProps, IPieceState> {
     e.dataTransfer.setData("text/y", e.target.getAttribute("data-y"));
     e.dataTransfer.setData("text/piece", e.target.getAttribute("data-piece"));
     e.dataTransfer.setData("text/moves", this.state.possible_moves);
+    e.dataTransfer.setData("text/special", this.state.is_special_move);
 
     for (let i = 0; i < this.state.possible_moves.length; i++) {
       this.props.set_overlay_callback(
@@ -65,7 +71,7 @@ export default class Piece extends Component<IPieceProps, IPieceState> {
   }
 
   getPossibleMoves() {
-    return [] as number[][];
+    return { moves: [] as number[][], is_special: [] as string[] };
   }
 
   canPieceMove(toX: number, toY: number) {

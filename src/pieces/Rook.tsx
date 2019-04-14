@@ -83,12 +83,14 @@ export default class Rook extends Piece {
     let y = +this.props.y;
 
     let ret = [] as number[][];
+    let isSpecial = [] as string[];
 
     let canMoveMore = true;
     for (let i = x + 1; i < 8; i++) {
       let canMove = this.canPieceMove(i, y);
       if (canMove > 0) {
         ret.push([i, y]);
+        isSpecial.push("");
       }
 
       if (canMove == 2 || canMove == 0) {
@@ -105,6 +107,7 @@ export default class Rook extends Piece {
       let canMove = this.canPieceMove(i, y);
       if (canMove > 0) {
         ret.push([i, y]);
+        isSpecial.push("");
       }
 
       if (canMove == 2 || canMove == 0) {
@@ -121,6 +124,7 @@ export default class Rook extends Piece {
       let canMove = this.canPieceMove(x, i);
       if (canMove > 0) {
         ret.push([x, i]);
+        isSpecial.push("");
       }
 
       if (canMove == 2 || canMove == 0) {
@@ -137,6 +141,7 @@ export default class Rook extends Piece {
       let canMove = this.canPieceMove(x, i);
       if (canMove > 0) {
         ret.push([x, i]);
+        isSpecial.push("");
       }
 
       if (canMove == 2 || canMove == 0) {
@@ -148,7 +153,7 @@ export default class Rook extends Piece {
       }
     }
 
-    return ret;
+    return { moves: ret, is_special: isSpecial };
   }
 
   canPieceMove(toX: number, toY: number) {

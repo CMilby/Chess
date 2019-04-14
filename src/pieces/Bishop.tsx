@@ -98,6 +98,8 @@ export default class Bishop extends Piece {
     let y = +this.props.y;
 
     let ret = [] as number[][];
+    let isSpecial = [] as string[];
+
     let canMoveMore = true;
     for (let i = 1; i < 8; i++) {
       if (x + i > 7 || y + i > 7) {
@@ -107,6 +109,7 @@ export default class Bishop extends Piece {
       let canMove = this.canPieceMove(x + i, y + i);
       if (canMove > 0) {
         ret.push([x + i, y + i]);
+        isSpecial.push("");
       }
 
       if (canMove == 2 || canMove == 0) {
@@ -127,6 +130,7 @@ export default class Bishop extends Piece {
       let canMove = this.canPieceMove(x - i, y - i);
       if (canMove > 0) {
         ret.push([x - i, y - i]);
+        isSpecial.push("");
       }
 
       if (canMove == 2 || canMove == 0) {
@@ -147,6 +151,7 @@ export default class Bishop extends Piece {
       let canMove = this.canPieceMove(x + i, y - i);
       if (canMove > 0) {
         ret.push([x + i, y - i]);
+        isSpecial.push("");
       }
 
       if (canMove == 2 || canMove == 0) {
@@ -167,6 +172,7 @@ export default class Bishop extends Piece {
       let canMove = this.canPieceMove(x - i, y + i);
       if (canMove > 0) {
         ret.push([x - i, y + i]);
+        isSpecial.push("");
       }
 
       if (canMove == 2 || canMove == 0) {
@@ -178,7 +184,7 @@ export default class Bishop extends Piece {
       }
     }
 
-    return ret;
+    return { moves: ret, is_special: isSpecial };
   }
 
   canPieceMove(toX: number, toY: number) {

@@ -115,7 +115,7 @@ export default class Board extends Component<IBoardProps, IBoardState> {
     this.boardRefs[y][x].current.setOverlay(show);
   }
 
-  setPiece(x: number, y: number, piece: string, recalculate: boolean) {
+  setPiece(x: number, y: number, piece: string) {
     let board = this.state.board;
     board[y][x] = piece;
 
@@ -125,8 +125,8 @@ export default class Board extends Component<IBoardProps, IBoardState> {
     this.setState({ board: board, has_moved: hasMoved });
   }
 
-  removePiece(x: number, y: number, recalculate: boolean) {
-    this.setPiece(x, y, "", recalculate);
+  removePiece(x: number, y: number) {
+    this.setPiece(x, y, "");
   }
 
   calculateAllMoves() {

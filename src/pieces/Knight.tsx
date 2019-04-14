@@ -57,13 +57,16 @@ export default class Knight extends Piece {
     let allMoves = this.getAllMoves();
 
     let possibleMoves = [] as number[][];
+    let isSpecial = [] as string[];
+
     allMoves.map(x => {
       if (this.canPieceMove(x[0], x[1]) == 1) {
         possibleMoves.push(x);
+        isSpecial.push("");
       }
     });
 
-    return possibleMoves;
+    return { moves: possibleMoves, is_special: isSpecial };
   }
 
   canPieceMove(toX: number, toY: number) {

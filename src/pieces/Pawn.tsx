@@ -37,6 +37,8 @@ export default class Pawn extends Piece {
     let y = +this.props.y;
 
     let ret = [] as number[][];
+    let isSpecial = [] as string[];
+
     if (!this.props.has_moved_piece) {
       if (
         this.props.piece_type.endsWith("light") &&
@@ -44,6 +46,7 @@ export default class Pawn extends Piece {
         this.props.board[y + 2][x] == ""
       ) {
         ret.push([x, y + 2]);
+        isSpecial.push("");
       }
 
       if (
@@ -52,6 +55,7 @@ export default class Pawn extends Piece {
         this.props.board[y - 2][x] == ""
       ) {
         ret.push([x, y - 2]);
+        isSpecial.push("");
       }
     }
 
@@ -60,6 +64,7 @@ export default class Pawn extends Piece {
       this.props.board[y + 1][x] == ""
     ) {
       ret.push([x, y + 1]);
+      isSpecial.push("");
     }
 
     if (
@@ -67,35 +72,40 @@ export default class Pawn extends Piece {
       this.props.board[y - 1][x] == ""
     ) {
       ret.push([x, y - 1]);
+      isSpecial.push("");
     }
 
     if (this.props.piece_type.endsWith("light")) {
       if (x - 1 >= 0) {
         if (this.props.board[y + 1][x - 1].endsWith("dark")) {
           ret.push([x - 1, y + 1]);
+          isSpecial.push("");
         }
       }
 
       if (x + 1 < 8) {
         if (this.props.board[y + 1][x + 1].endsWith("dark")) {
           ret.push([x + 1, y + 1]);
+          isSpecial.push("");
         }
       }
     } else if (this.props.piece_type.endsWith("dark")) {
       if (x - 1 >= 0) {
         if (this.props.board[y - 1][x - 1].endsWith("light")) {
           ret.push([x - 1, y - 1]);
+          isSpecial.push("");
         }
       }
 
       if (x + 1 < 8) {
         if (this.props.board[y - 1][x + 1].endsWith("light")) {
           ret.push([x + 1, y - 1]);
+          isSpecial.push("");
         }
       }
     }
 
-    return ret;
+    return { moves: ret, is_special: isSpecial };
   }
 
   canPieceMove(toX: number, toY: number) {

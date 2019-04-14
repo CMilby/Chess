@@ -47,11 +47,13 @@ export default class King extends Piece {
 
   getPossibleMoves() {
     let allMoves = this.getAllMoves();
+    let isSpecial = [] as string[];
 
     let possibleMoves = [] as number[][];
     allMoves.map(x => {
       if (this.canPieceMove(x[0], x[1]) == 1) {
         possibleMoves.push(x);
+        isSpecial.push("");
       }
     });
 
@@ -71,6 +73,7 @@ export default class King extends Piece {
           !this.isSquareCovered(6, 0, this.props.piece_type)
         ) {
           possibleMoves.push([6, 0]);
+          isSpecial.push("OO_light");
         }
       }
     } else if (
@@ -88,11 +91,55 @@ export default class King extends Piece {
           !this.isSquareCovered(6, 7, this.props.piece_type)
         ) {
           possibleMoves.push([6, 7]);
+          isSpecial.push("OO_dark");
         }
       }
     }
 
-    return possibleMoves;
+    // Check queen side castle
+    if (
+      this.props.piece_type.endsWith("light") &&
+      !this.props.has_moved_piece
+    ) {
+      if (
+        this.props.board[0][1] == "" &&
+        this.props.board[0][2] == "" &&
+        this.props.board[0][3] == "" &&
+        this.props.board[0][0] == "rook_light" &&
+        !this.props.has_moved[0][0]
+      ) {
+        if (
+          !this.isSquareCovered(1, 0, this.props.piece_type) &&
+          !this.isSquareCovered(2, 0, this.props.piece_type) &&
+          !this.isSquareCovered(3, 0, this.props.piece_type)
+        ) {
+          possibleMoves.push([2, 0]);
+          isSpecial.push("OOO_light");
+        }
+      }
+    } else if (
+      this.props.piece_type.endsWith("dark") &&
+      !this.props.has_moved_piece
+    ) {
+      if (
+        this.props.board[7][1] == "" &&
+        this.props.board[7][2] == "" &&
+        this.props.board[7][3] == "" &&
+        this.props.board[7][0] == "rook_dark" &&
+        !this.props.has_moved[7][0]
+      ) {
+        if (
+          !this.isSquareCovered(1, 7, this.props.piece_type) &&
+          !this.isSquareCovered(2, 7, this.props.piece_type) &&
+          !this.isSquareCovered(3, 7, this.props.piece_type)
+        ) {
+          possibleMoves.push([2, 7]);
+          isSpecial.push("OOO_dark");
+        }
+      }
+    }
+
+    return { moves: possibleMoves, is_special: isSpecial };
   }
 
   isSquareCovered(x: number, y: number, piece: string) {

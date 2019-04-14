@@ -54,6 +54,8 @@ export default class BoardSquare extends Component<
     let oldY = e.dataTransfer.getData("text/y") as number;
 
     let moves = e.dataTransfer.getData("text/moves").split(",");
+    let isSpecial = e.dataTransfer.getData("text/special").split(",");
+
     let movePairs = [] as number[][];
 
     for (let i = 0; i < moves.length; i += 2) {
@@ -65,17 +67,33 @@ export default class BoardSquare extends Component<
       this.props.set_overlay_callback(moves[i + 0], moves[i + 1], false);
     }
 
+    let special = "";
     let isValid = false;
     for (let i = 0; i < movePairs.length; i++) {
       if (this.props.x == movePairs[i][0] && this.props.y == movePairs[i][1]) {
         isValid = true;
+        special = isSpecial[i];
         break;
       }
     }
 
     if (isValid) {
-      this.props.remove_piece_callback(oldX, oldY, false);
-      this.props.add_piece_callback(this.props.x, this.props.y, piece, true);
+      this.props.remove_piece_callback(oldX, oldY);
+      this.props.add_piece_callback(this.props.x, this.props.y, piece);
+
+      if (special == "OO_light") {
+        this.props.remove_piece_callback(7, 0);
+        this.props.add_piece_callback(5, 0, "rook_light");
+      } else if (special == "OOO_light") {
+        this.props.remove_piece_callback(0, 0);
+        this.props.add_piece_callback(3, 0, "rook_light");
+      } else if (special == "OO_dark") {
+        this.props.remove_piece_callback(7, 7);
+        this.props.add_piece_callback(5, 7, "rook_dark");
+      } else if (special == "OOO_dark") {
+        this.props.remove_piece_callback(0, 7);
+        this.props.add_piece_callback(3, 7, "rook_dark");
+      }
     }
   }
 
