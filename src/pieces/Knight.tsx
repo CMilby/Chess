@@ -70,7 +70,7 @@ export default class Knight extends Piece {
   }
 
   canPieceMove(toX: number, toY: number) {
-    let pieceType = this.props.board[toY][toX];
+    let pieceType = this.props.board[toY][toX].piece;
 
     if (
       pieceType == "" ||

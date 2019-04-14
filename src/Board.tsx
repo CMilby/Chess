@@ -7,9 +7,9 @@ import "./Board.css";
 export interface IBoardProps {}
 
 export interface IBoardState {
-  board: string[][];
-  has_moved: boolean[][];
+  board: { piece: string; has_moved: boolean }[][];
   covered_squares: string[][][];
+  last_move: any;
 }
 
 export default class Board extends Component<IBoardProps, IBoardState> {
@@ -19,20 +19,21 @@ export default class Board extends Component<IBoardProps, IBoardState> {
 
     this.state = {
       board: [],
-      has_moved: [],
-      covered_squares: []
+      covered_squares: [],
+      last_move: {}
     };
 
     this.boardRefs = [];
     for (let y = 0; y < 8; y++) {
       this.state.board[y] = [];
-      this.state.has_moved[y] = [];
       this.boardRefs[y] = [];
 
       for (let x = 0; x < 8; x++) {
-        this.state.has_moved[y][x] = false;
         this.boardRefs[y][x] = React.createRef();
-        this.state.board[y][x] = this.setupGame(x, y);
+        this.state.board[y][x] = {
+          piece: this.setupGame(x, y),
+          has_moved: false
+        };
       }
     }
   }
@@ -92,20 +93,19 @@ export default class Board extends Component<IBoardProps, IBoardState> {
     return piece;
   }
 
-  makeSquare(x: number, y: number, piece: string, has_moved: boolean) {
+  makeSquare(x: number, y: number, piece: any) {
     return (
       <BoardSquare
         x={x}
         y={y}
         key={"board_square_" + x + "_" + y}
-        piece_type={piece}
-        piece_has_moved={has_moved}
-        remove_piece_callback={this.removePiece.bind(this)}
-        add_piece_callback={this.setPiece.bind(this)}
+        piece_type={piece.piece}
+        piece_has_moved={piece.has_moved}
         set_overlay_callback={this.setOverlay.bind(this)}
+        set_and_remove_callback={this.setAndRemovePiece.bind(this)}
         board={this.state.board}
-        has_moved={this.state.has_moved}
         covered_squares={this.state.covered_squares}
+        last_move={this.state.last_move}
         ref={this.boardRefs[y][x]}
       />
     );
@@ -115,19 +115,58 @@ export default class Board extends Component<IBoardProps, IBoardState> {
     this.boardRefs[y][x].current.setOverlay(show);
   }
 
-  setPiece(x: number, y: number, piece: string) {
+  setAndRemovePiece(
+    xRemove: number,
+    yRemove: number,
+    xSet: number,
+    ySet: number,
+    piece: string
+  ) {
     let board = this.state.board;
-    board[y][x] = piece;
+    let lastMove = {
+      piece: piece,
+      first_move: !board[yRemove][xRemove].has_moved,
+      fromX: xRemove,
+      fromY: yRemove,
+      toX: xSet,
+      toY: ySet
+    };
 
-    let hasMoved = this.state.has_moved;
-    hasMoved[y][x] = true;
+    board[yRemove][xRemove] = { piece: "", has_moved: true };
+    board[ySet][xSet] = { piece: piece, has_moved: true };
 
-    this.setState({ board: board, has_moved: hasMoved });
+    this.setState({ board: board, last_move: lastMove });
+  }
+
+  /*
+  setPiece(x: number, y: number, piece: string, xFrom: number, yFrom: number) {
+    let lastMove = {
+      piece: piece,
+      first_move: false
+    };
+
+    let board = this.state.board;
+    board[y][x] = { piece: piece, has_moved: true };
+
+    /* let hasMoved = this.state.has_moved;
+
+    let lastMove = {
+      piece: piece,
+      first_move: !hasMoved[y][x],
+      to: [x, y]
+    };
+
+    // hasMoved[y][x] = true;
+
+    this.setState({ board: board, last_move: lastMove });
   }
 
   removePiece(x: number, y: number) {
-    this.setPiece(x, y, "");
-  }
+    let board = this.state.board;
+    board[y][x] = { piece: "", has_moved: true };
+
+    this.setState({ board: board });
+  }*/
 
   calculateAllMoves() {
     let states = [] as string[][][];
@@ -146,7 +185,7 @@ export default class Board extends Component<IBoardProps, IBoardState> {
         ].current.calculateCoveredSquares();
 
         coveredSquares.map((i: any) => {
-          states[i[1]][i[0]].push(this.state.board[y][x]);
+          states[i[1]][i[0]].push(this.state.board[y][x].piece);
         });
       }
     }
@@ -161,12 +200,7 @@ export default class Board extends Component<IBoardProps, IBoardState> {
     for (let y = 0; y < 8; y++) {
       board[y] = [];
       for (let x = 0; x < 8; x++) {
-        board[y][x] = this.makeSquare(
-          x,
-          y,
-          this.state.board[y][x],
-          this.state.has_moved[y][x]
-        );
+        board[y][x] = this.makeSquare(x, y, this.state.board[y][x]);
       }
     }
 

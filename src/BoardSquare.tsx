@@ -16,13 +16,13 @@ export interface IBoardSquareProps {
   piece_type: string;
   piece_has_moved: boolean;
 
-  remove_piece_callback: any;
-  add_piece_callback: any;
   set_overlay_callback: any;
+  set_and_remove_callback: any;
 
-  board: string[][];
-  has_moved: boolean[][];
+  board: { piece: string; has_moved: boolean }[][];
   covered_squares: string[][][];
+
+  last_move: any;
 }
 
 export interface IBoardSquareState {
@@ -78,21 +78,31 @@ export default class BoardSquare extends Component<
     }
 
     if (isValid) {
-      this.props.remove_piece_callback(oldX, oldY);
-      this.props.add_piece_callback(this.props.x, this.props.y, piece);
+      this.props.set_and_remove_callback(
+        oldX,
+        oldY,
+        this.props.x,
+        this.props.y,
+        piece
+      );
 
       if (special == "OO_light") {
-        this.props.remove_piece_callback(7, 0);
-        this.props.add_piece_callback(5, 0, "rook_light");
+        this.props.set_and_remove_callback(7, 0, 5, 0, "rook_light");
       } else if (special == "OOO_light") {
-        this.props.remove_piece_callback(0, 0);
-        this.props.add_piece_callback(3, 0, "rook_light");
+        this.props.set_and_remove_callback(0, 0, 3, 0, "rook_light");
       } else if (special == "OO_dark") {
-        this.props.remove_piece_callback(7, 7);
-        this.props.add_piece_callback(5, 7, "rook_dark");
+        this.props.set_and_remove_callback(7, 7, 5, 7, "rook_dark");
       } else if (special == "OOO_dark") {
-        this.props.remove_piece_callback(0, 7);
-        this.props.add_piece_callback(3, 7, "rook_dark");
+        this.props.set_and_remove_callback(0, 7, 3, 7, "rook_dark");
+      } else if (special.startsWith("en_passant")) {
+        let tokens = special.split("_");
+        this.props.set_and_remove_callback(
+          tokens[2],
+          tokens[3],
+          tokens[2],
+          tokens[3],
+          ""
+        );
       }
     }
   }
@@ -106,9 +116,9 @@ export default class BoardSquare extends Component<
           y={this.props.y}
           has_moved_piece={this.props.piece_has_moved}
           board={this.props.board}
-          has_moved={this.props.has_moved}
           covered_squares={this.props.covered_squares}
           set_overlay_callback={this.props.set_overlay_callback}
+          last_move={this.props.last_move}
           ref={this.pieceRef}
         />
       );
@@ -120,9 +130,9 @@ export default class BoardSquare extends Component<
           y={this.props.y}
           has_moved_piece={this.props.piece_has_moved}
           board={this.props.board}
-          has_moved={this.props.has_moved}
           covered_squares={this.props.covered_squares}
           set_overlay_callback={this.props.set_overlay_callback}
+          last_move={this.props.last_move}
           ref={this.pieceRef}
         />
       );
@@ -134,9 +144,9 @@ export default class BoardSquare extends Component<
           y={this.props.y}
           has_moved_piece={this.props.piece_has_moved}
           board={this.props.board}
-          has_moved={this.props.has_moved}
           covered_squares={this.props.covered_squares}
           set_overlay_callback={this.props.set_overlay_callback}
+          last_move={this.props.last_move}
           ref={this.pieceRef}
         />
       );
@@ -148,9 +158,9 @@ export default class BoardSquare extends Component<
           y={this.props.y}
           has_moved_piece={this.props.piece_has_moved}
           board={this.props.board}
-          has_moved={this.props.has_moved}
           covered_squares={this.props.covered_squares}
           set_overlay_callback={this.props.set_overlay_callback}
+          last_move={this.props.last_move}
           ref={this.pieceRef}
         />
       );
@@ -162,9 +172,9 @@ export default class BoardSquare extends Component<
           y={this.props.y}
           has_moved_piece={this.props.piece_has_moved}
           board={this.props.board}
-          has_moved={this.props.has_moved}
           covered_squares={this.props.covered_squares}
           set_overlay_callback={this.props.set_overlay_callback}
+          last_move={this.props.last_move}
           ref={this.pieceRef}
         />
       );
@@ -176,9 +186,9 @@ export default class BoardSquare extends Component<
           y={this.props.y}
           has_moved_piece={this.props.piece_has_moved}
           board={this.props.board}
-          has_moved={this.props.has_moved}
           covered_squares={this.props.covered_squares}
           set_overlay_callback={this.props.set_overlay_callback}
+          last_move={this.props.last_move}
           ref={this.pieceRef}
         />
       );
@@ -191,9 +201,9 @@ export default class BoardSquare extends Component<
         y={this.props.y}
         has_moved_piece={this.props.piece_has_moved}
         board={this.props.board}
-        has_moved={this.props.has_moved}
         covered_squares={this.props.covered_squares}
         set_overlay_callback={this.props.set_overlay_callback}
+        last_move={this.props.last_move}
         ref={this.pieceRef}
       />
     );

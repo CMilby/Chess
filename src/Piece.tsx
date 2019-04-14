@@ -8,9 +8,10 @@ export interface IPieceProps {
 
   set_overlay_callback: any;
 
-  board: string[][];
-  has_moved: boolean[][];
+  board: { piece: string; has_moved: boolean }[][];
   covered_squares: string[][][];
+
+  last_move: any;
 }
 
 export interface IPieceState {

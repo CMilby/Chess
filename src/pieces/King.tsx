@@ -63,10 +63,10 @@ export default class King extends Piece {
       !this.props.has_moved_piece
     ) {
       if (
-        this.props.board[0][5] == "" &&
-        this.props.board[0][6] == "" &&
-        this.props.board[0][7] == "rook_light" &&
-        !this.props.has_moved[0][7]
+        this.props.board[0][5].piece == "" &&
+        this.props.board[0][6].piece == "" &&
+        this.props.board[0][7].piece == "rook_light" &&
+        !this.props.board[0][7].has_moved
       ) {
         if (
           !this.isSquareCovered(5, 0, this.props.piece_type) &&
@@ -81,10 +81,10 @@ export default class King extends Piece {
       !this.props.has_moved_piece
     ) {
       if (
-        this.props.board[7][5] == "" &&
-        this.props.board[7][6] == "" &&
-        this.props.board[7][7] == "rook_dark" &&
-        !this.props.has_moved[7][7]
+        this.props.board[7][5].piece == "" &&
+        this.props.board[7][6].piece == "" &&
+        this.props.board[7][7].piece == "rook_dark" &&
+        !this.props.board[7][7].has_moved
       ) {
         if (
           !this.isSquareCovered(5, 7, this.props.piece_type) &&
@@ -102,11 +102,11 @@ export default class King extends Piece {
       !this.props.has_moved_piece
     ) {
       if (
-        this.props.board[0][1] == "" &&
-        this.props.board[0][2] == "" &&
-        this.props.board[0][3] == "" &&
-        this.props.board[0][0] == "rook_light" &&
-        !this.props.has_moved[0][0]
+        this.props.board[0][1].piece == "" &&
+        this.props.board[0][2].piece == "" &&
+        this.props.board[0][3].piece == "" &&
+        this.props.board[0][0].piece == "rook_light" &&
+        !this.props.board[0][0].has_moved
       ) {
         if (
           !this.isSquareCovered(1, 0, this.props.piece_type) &&
@@ -122,11 +122,11 @@ export default class King extends Piece {
       !this.props.has_moved_piece
     ) {
       if (
-        this.props.board[7][1] == "" &&
-        this.props.board[7][2] == "" &&
-        this.props.board[7][3] == "" &&
-        this.props.board[7][0] == "rook_dark" &&
-        !this.props.has_moved[7][0]
+        this.props.board[7][1].piece == "" &&
+        this.props.board[7][2].piece == "" &&
+        this.props.board[7][3].piece == "" &&
+        this.props.board[7][0].piece == "rook_dark" &&
+        !this.props.board[7][0].has_moved
       ) {
         if (
           !this.isSquareCovered(1, 7, this.props.piece_type) &&
@@ -163,7 +163,7 @@ export default class King extends Piece {
   }
 
   canPieceMove(toX: number, toY: number) {
-    let pieceType = this.props.board[toY][toX];
+    let pieceType = this.props.board[toY][toX].piece;
     let covered = [] as string[];
     if (this.props.covered_squares.length > 0) {
       covered = this.props.covered_squares[toY][toX];
