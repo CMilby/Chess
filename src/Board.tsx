@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 
 import BoardSquare from "./BoardSquare";
-import PromotionModal from "./PromotionModal";
 
 import { calculateAllMoves } from "./Game";
 
@@ -18,6 +17,13 @@ export interface IBoardState {
     is_special: string[];
     covered: string[];
     show_overlay: boolean;
+    overlay: {
+      type: string;
+      piece: string;
+      color: string;
+      x: number;
+      y: number;
+    };
   }[][];
   last_move: {
     fromX: number;
@@ -44,7 +50,7 @@ export default class Board extends Component<IBoardProps, IBoardState> {
       last_move: { fromX: 0, fromY: 0, toX: 0, toY: 0, piece: "", color: "" },
       promotion_modal: {
         show: false,
-        color: "",
+        color: "light",
         x: -1,
         y: -1
       }
@@ -61,7 +67,14 @@ export default class Board extends Component<IBoardProps, IBoardState> {
           possible_moves: [],
           is_special: [],
           covered: [],
-          show_overlay: false
+          show_overlay: false,
+          overlay: {
+            type: "move",
+            piece: "",
+            color: "",
+            x: -1,
+            y: -1
+          }
         };
       }
     }
@@ -138,7 +151,10 @@ export default class Board extends Component<IBoardProps, IBoardState> {
         color={color}
         set_overlay_callback={this.setOverlay.bind(this)}
         set_and_remove_callback={this.setAndRemovePiece.bind(this)}
-        promotion_panel_callback={this.showPromotionModal.bind(this)}
+        promotion_overlay_show_callback={this.showPromotionOverlay.bind(this)}
+        promotion_overlay_click_callback={this.handlePromotionOverlayClick.bind(
+          this
+        )}
         board={this.state.board}
         last_move={this.state.last_move}
       />
@@ -177,8 +193,16 @@ export default class Board extends Component<IBoardProps, IBoardState> {
       possible_moves: [],
       is_special: [],
       covered: [],
-      show_overlay: false
+      show_overlay: false,
+      overlay: {
+        type: "move",
+        piece: "",
+        color: "",
+        x: -1,
+        y: -1
+      }
     };
+
     board[ySet][xSet] = {
       piece: piece,
       color: color,
@@ -186,29 +210,72 @@ export default class Board extends Component<IBoardProps, IBoardState> {
       possible_moves: [],
       is_special: [],
       covered: [],
-      show_overlay: false
+      show_overlay: false,
+      overlay: {
+        type: "move",
+        piece: "",
+        color: "",
+        x: -1,
+        y: -1
+      }
     };
 
     this.setState({ board: board, last_move: lastMove });
   }
 
-  handlePromotionModalClick(
+  handlePromotionOverlayClick(
     piece: string,
     color: string,
     x: number,
     y: number
   ) {
-    this.setState({
-      promotion_modal: { show: false, color: "", x: -1, y: -1 }
-    });
+    let board = this.state.board;
 
+    for (let i = 0; i < 4; i++) {
+      if (color == "light") {
+        board[y - i][x].show_overlay = false;
+        board[y - i][x].overlay.type = "move";
+        board[y - i][x].overlay.piece = "";
+        board[y - i][x].overlay.color = "";
+        board[y - i][x].overlay.x = -1;
+        board[y - i][x].overlay.y = -1;
+      } else if (color == "dark") {
+        board[y + i][x].show_overlay = false;
+        board[y + i][x].overlay.type = "move";
+        board[y + i][x].overlay.piece = "";
+        board[y + i][x].overlay.color = "";
+        board[y + i][x].overlay.x = -1;
+        board[y + i][x].overlay.y = -1;
+      }
+    }
+
+    this.setState({ board: board });
     this.setAndRemovePiece(x, y, x, y, piece, color);
   }
 
-  showPromotionModal(color: string, x: number, y: number) {
-    this.setState({
-      promotion_modal: { show: true, color: color, x: x, y: y }
-    });
+  showPromotionOverlay(color: string, x: number, y: number) {
+    let pieces = ["queen", "rook", "bishop", "knight"];
+    let board = this.state.board;
+
+    for (let i = 0; i < 4; i++) {
+      if (color == "light") {
+        board[y - i][x].show_overlay = true;
+        board[y - i][x].overlay.type = "promote";
+        board[y - i][x].overlay.piece = pieces[i];
+        board[y - i][x].overlay.color = color;
+        board[y - i][x].overlay.x = x;
+        board[y - i][x].overlay.y = y;
+      } else if (color == "dark") {
+        board[y + i][x].show_overlay = true;
+        board[y + i][x].overlay.type = "promote";
+        board[y + i][x].overlay.piece = pieces[i];
+        board[y + i][x].overlay.color = color;
+        board[y + i][x].overlay.x = x;
+        board[y + i][x].overlay.y = y;
+      }
+    }
+
+    this.setState({ board: board });
   }
 
   render() {
@@ -226,7 +293,7 @@ export default class Board extends Component<IBoardProps, IBoardState> {
     }
 
     return (
-      <div id="board">
+      <div id="board" className="board-parent">
         <table className="board">
           <tbody>
             <tr>{board[7]}</tr>
@@ -239,10 +306,6 @@ export default class Board extends Component<IBoardProps, IBoardState> {
             <tr>{board[0]}</tr>
           </tbody>
         </table>
-        <PromotionModal
-          promotion_modal={this.state.promotion_modal}
-          handle_click_callback={this.handlePromotionModalClick.bind(this)}
-        />
       </div>
     );
   }

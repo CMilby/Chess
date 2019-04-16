@@ -12,7 +12,8 @@ export interface IBoardSquareProps {
 
   set_overlay_callback: any;
   set_and_remove_callback: any;
-  promotion_panel_callback: any;
+  promotion_overlay_show_callback: any;
+  promotion_overlay_click_callback: any;
 
   board: {
     piece: string;
@@ -22,6 +23,13 @@ export interface IBoardSquareProps {
     is_special: string[];
     covered: string[];
     show_overlay: boolean;
+    overlay: {
+      type: string;
+      piece: string;
+      color: string;
+      x: number;
+      y: number;
+    };
   }[][];
   last_move: {
     fromX: number;
@@ -105,7 +113,11 @@ export default class BoardSquare extends Component<
           ""
         );
       } else if (special.startsWith("promotion")) {
-        this.props.promotion_panel_callback(color, this.props.x, this.props.y);
+        this.props.promotion_overlay_show_callback(
+          color,
+          this.props.x,
+          this.props.y
+        );
       }
     }
   }
@@ -137,7 +149,17 @@ export default class BoardSquare extends Component<
 
     let overlay = <div />;
     if (this.props.board[y][x].show_overlay) {
-      overlay = <Overlay color="green" x={this.props.x} y={this.props.y} />;
+      overlay = (
+        <Overlay
+          color="green"
+          x={this.props.x}
+          y={this.props.y}
+          promotion_overlay_click_callback={
+            this.props.promotion_overlay_click_callback
+          }
+          overlay={this.props.board[y][x].overlay}
+        />
+      );
     }
 
     return (
