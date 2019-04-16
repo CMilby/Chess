@@ -12,6 +12,7 @@ export interface IBoardSquareProps {
 
   set_overlay_callback: any;
   set_and_remove_callback: any;
+  promotion_panel_callback: any;
 
   board: {
     piece: string;
@@ -103,6 +104,8 @@ export default class BoardSquare extends Component<
           tokens[3],
           ""
         );
+      } else if (special.startsWith("promotion")) {
+        this.props.promotion_panel_callback(color, this.props.x, this.props.y);
       }
     }
   }

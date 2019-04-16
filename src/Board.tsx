@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 
 import BoardSquare from "./BoardSquare";
+import PromotionModal from "./PromotionModal";
 
 import { calculateAllMoves } from "./Game";
 
@@ -26,6 +27,12 @@ export interface IBoardState {
     piece: string;
     color: string;
   };
+  promotion_modal: {
+    show: boolean;
+    color: string;
+    x: number;
+    y: number;
+  };
 }
 
 export default class Board extends Component<IBoardProps, IBoardState> {
@@ -34,7 +41,13 @@ export default class Board extends Component<IBoardProps, IBoardState> {
 
     this.state = {
       board: [],
-      last_move: { fromX: 0, fromY: 0, toX: 0, toY: 0, piece: "", color: "" }
+      last_move: { fromX: 0, fromY: 0, toX: 0, toY: 0, piece: "", color: "" },
+      promotion_modal: {
+        show: false,
+        color: "",
+        x: -1,
+        y: -1
+      }
     };
 
     for (let y = 0; y < 8; y++) {
@@ -125,6 +138,7 @@ export default class Board extends Component<IBoardProps, IBoardState> {
         color={color}
         set_overlay_callback={this.setOverlay.bind(this)}
         set_and_remove_callback={this.setAndRemovePiece.bind(this)}
+        promotion_panel_callback={this.showPromotionModal.bind(this)}
         board={this.state.board}
         last_move={this.state.last_move}
       />
@@ -178,92 +192,24 @@ export default class Board extends Component<IBoardProps, IBoardState> {
     this.setState({ board: board, last_move: lastMove });
   }
 
-  /*
-  setPiece(x: number, y: number, piece: string, xFrom: number, yFrom: number) {
-    let lastMove = {
-      piece: piece,
-      first_move: false
-    };
-
-    let board = this.state.board;
-    board[y][x] = { piece: piece, has_moved: true };
-
-    /* let hasMoved = this.state.has_moved;
-
-    let lastMove = {
-      piece: piece,
-      first_move: !hasMoved[y][x],
-      to: [x, y]
-    };
-
-    // hasMoved[y][x] = true;
-
-    this.setState({ board: board, last_move: lastMove });
-  }
-
-  removePiece(x: number, y: number) {
-    let board = this.state.board;
-    board[y][x] = { piece: "", has_moved: true };
-
-    this.setState({ board: board });
-  }*/
-
-  /* calculateAllMoves(
-    board: { piece: string; has_moved: any }[][],
-    coveredSquares: string[][][]
-  ) {
-    let states = [] as string[][][];
-    for (let y = 0; y < 8; y++) {
-      states[y] = [];
-      for (let x = 0; x < 8; x++) {
-        states[y][x] = [];
-      }
-    }
-
-    let inCheckDark = this.inCheck("dark", board, coveredSquares);
-    let inCheckLight = this.inCheck("light", board, coveredSquares);
-
-    for (let y = 0; y < 8; y++) {
-      for (let x = 0; x < 8; x++) {
-        if (board[y][x].piece.endsWith("dark")) {
-          this.boardRefs[y][x].current.calculateMoves(inCheckDark);
-        } else if (board[y][x].piece.endsWith("light")) {
-          this.boardRefs[y][x].current.calculateMoves(inCheckLight);
-        }
-
-        let coveredSquares = this.boardRefs[y][
-          x
-        ].current.calculateCoveredSquares();
-
-        coveredSquares.map((i: any) => {
-          states[i[1]][i[0]].push(board[y][x].piece);
-        });
-      }
-    }
-
-    return states;
-  }
-
-  inCheck(
+  handlePromotionModalClick(
+    piece: string,
     color: string,
-    board: { piece: string; has_moved: any }[][],
-    coveredSquares: string[][][]
+    x: number,
+    y: number
   ) {
-    for (let y = 0; y < 8; y++) {
-      for (let x = 0; x < 8; x++) {
-        if (board[y][x].piece == "king_" + color) {
-          for (let i = 0; i < coveredSquares[y][x].length; i++) {
-            if (!coveredSquares[y][x][i].endsWith(color)) {
-              return true;
-            }
-          }
-        }
-      }
-    }
+    this.setState({
+      promotion_modal: { show: false, color: "", x: -1, y: -1 }
+    });
 
-    return false;
+    this.setAndRemovePiece(x, y, x, y, piece, color);
   }
-*/
+
+  showPromotionModal(color: string, x: number, y: number) {
+    this.setState({
+      promotion_modal: { show: true, color: color, x: x, y: y }
+    });
+  }
 
   render() {
     let board = [] as any[][];
@@ -280,7 +226,7 @@ export default class Board extends Component<IBoardProps, IBoardState> {
     }
 
     return (
-      <div>
+      <div id="board">
         <table className="board">
           <tbody>
             <tr>{board[7]}</tr>
@@ -293,6 +239,10 @@ export default class Board extends Component<IBoardProps, IBoardState> {
             <tr>{board[0]}</tr>
           </tbody>
         </table>
+        <PromotionModal
+          promotion_modal={this.state.promotion_modal}
+          handle_click_callback={this.handlePromotionModalClick.bind(this)}
+        />
       </div>
     );
   }

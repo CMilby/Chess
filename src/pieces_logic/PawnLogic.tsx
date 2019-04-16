@@ -23,6 +23,10 @@ export function pawnPossibleMoves(
   let moves = [] as number[][];
   let isSpecial = [] as string[];
 
+  if ((color == "light" && y == 7) || (color == "dark" && y == 0)) {
+    return { moves: moves, is_special: isSpecial };
+  }
+
   if (!board[y][x].has_moved) {
     if (
       color == "light" &&
@@ -83,6 +87,15 @@ export function pawnPossibleMoves(
     }
   }
 
+  // Check if promotion
+  for (let i = 0; i < moves.length; i++) {
+    if (color == "light" && moves[i][1] == 7) {
+      isSpecial[i] = "promotion";
+    } else if (color == "dark" && moves[i][1] == 0) {
+      isSpecial[i] = "promotion";
+    }
+  }
+
   // Check en passant
   if (color == "light" && y == 4) {
     if (
@@ -121,6 +134,10 @@ export function pawnPossibleMoves(
 
 export function pawnCoveredSquares(x: number, y: number, color: string) {
   let moves = [] as number[][];
+
+  if ((color == "light" && y == 7) || (color == "dark" && y == 0)) {
+    return moves;
+  }
 
   if (color == "light") {
     if (x - 1 >= 0) {

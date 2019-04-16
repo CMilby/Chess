@@ -25,3 +25,32 @@
 .odd-square {
   background-color: rgb(118, 150, 86);
 }
+
+.promotion-modal {
+  width: 90px;
+  height: 340px;
+  position: absolute;
+  top: 10px;
+  left: 70px;
+  background-color: #757575;
+  border-radius: 5px;
+}
+
+.promotion-modal-div {
+  padding-top: 10px;
+  padding-right: 5px;
+  padding-bottom: 10px;
+  padding-left: 5px;
+}
+
+.promotion-modal-btn {
+  width: 80px;
+  height: 80px;
+  border: 0px;
+  padding: 0px;
+  background-color: #a5a5a5;
+}
+
+.promotion-modal-btn:focus {
+  outline: none;
+}
