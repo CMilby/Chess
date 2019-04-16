@@ -2,117 +2,139 @@ import React, { Component } from "react";
 
 import BoardSquare from "./BoardSquare";
 
+import { calculateAllMoves } from "./Game";
+
 import "./Board.css";
 
 export interface IBoardProps {}
 
 export interface IBoardState {
-  board: { piece: string; has_moved: boolean }[][];
-  covered_squares: string[][][];
-  last_move: any;
+  board: {
+    piece: string;
+    color: string;
+    has_moved: boolean;
+    possible_moves: number[][];
+    is_special: string[];
+    covered: string[];
+    show_overlay: boolean;
+  }[][];
+  last_move: {
+    fromX: number;
+    fromY: number;
+    toX: number;
+    toY: number;
+    piece: string;
+    color: string;
+  };
 }
 
 export default class Board extends Component<IBoardProps, IBoardState> {
-  private boardRefs: React.RefObject<any>[][];
   constructor(props: any) {
     super(props);
 
     this.state = {
       board: [],
-      covered_squares: [],
-      last_move: {}
+      last_move: { fromX: 0, fromY: 0, toX: 0, toY: 0, piece: "", color: "" }
     };
 
-    this.boardRefs = [];
     for (let y = 0; y < 8; y++) {
       this.state.board[y] = [];
-      this.boardRefs[y] = [];
-
       for (let x = 0; x < 8; x++) {
-        this.boardRefs[y][x] = React.createRef();
+        let pieceAndColor = this.setupGame(x, y);
         this.state.board[y][x] = {
-          piece: this.setupGame(x, y),
-          has_moved: false
+          piece: pieceAndColor.piece,
+          color: pieceAndColor.color,
+          has_moved: false,
+          possible_moves: [],
+          is_special: [],
+          covered: [],
+          show_overlay: false
         };
       }
     }
   }
 
   componentDidMount() {
-    this.calculateAllMoves();
+    calculateAllMoves(this.state.board, this.state.last_move);
   }
 
   componentDidUpdate() {
-    this.calculateAllMoves();
+    calculateAllMoves(this.state.board, this.state.last_move);
   }
 
   setupGame(x: number, y: number) {
     let piece: string = "";
+    let color: string = "";
+
     if (y == 0) {
+      color = "light";
       if (x == 0) {
-        piece = "rook_light";
+        piece = "rook";
       } else if (x == 1) {
-        piece = "knight_light";
+        piece = "knight";
       } else if (x == 2) {
-        piece = "bishop_light";
+        piece = "bishop";
       } else if (x == 3) {
-        piece = "queen_light";
+        piece = "queen";
       } else if (x == 4) {
-        piece = "king_light";
+        piece = "king";
       } else if (x == 5) {
-        piece = "bishop_light";
+        piece = "bishop";
       } else if (x == 6) {
-        piece = "knight_light";
+        piece = "knight";
       } else if (x == 7) {
-        piece = "rook_light";
+        piece = "rook";
       }
     } else if (y == 1) {
-      piece = "pawn_light";
+      color = "light";
+      piece = "pawn";
     } else if (y == 6) {
-      piece = "pawn_dark";
+      color = "dark";
+      piece = "pawn";
     } else if (y == 7) {
+      color = "dark";
       if (x == 0) {
-        piece = "rook_dark";
+        piece = "rook";
       } else if (x == 1) {
-        piece = "knight_dark";
+        piece = "knight";
       } else if (x == 2) {
-        piece = "bishop_dark";
+        piece = "bishop";
       } else if (x == 3) {
-        piece = "queen_dark";
+        piece = "queen";
       } else if (x == 4) {
-        piece = "king_dark";
+        piece = "king";
       } else if (x == 5) {
-        piece = "bishop_dark";
+        piece = "bishop";
       } else if (x == 6) {
-        piece = "knight_dark";
+        piece = "knight";
       } else if (x == 7) {
-        piece = "rook_dark";
+        piece = "rook";
       }
     }
 
-    return piece;
+    return { piece: piece, color: color };
   }
 
-  makeSquare(x: number, y: number, piece: any) {
+  makeSquare(x: number, y: number, piece: string, color: string) {
     return (
       <BoardSquare
         x={x}
         y={y}
         key={"board_square_" + x + "_" + y}
-        piece_type={piece.piece}
-        piece_has_moved={piece.has_moved}
+        piece={piece}
+        color={color}
         set_overlay_callback={this.setOverlay.bind(this)}
         set_and_remove_callback={this.setAndRemovePiece.bind(this)}
         board={this.state.board}
-        covered_squares={this.state.covered_squares}
         last_move={this.state.last_move}
-        ref={this.boardRefs[y][x]}
       />
     );
   }
 
   setOverlay(x: number, y: number, show: boolean) {
-    this.boardRefs[y][x].current.setOverlay(show);
+    let board = this.state.board;
+    board[y][x].show_overlay = show;
+    this.setState({ board: board });
   }
 
   setAndRemovePiece(
@@ -120,11 +142,13 @@ export default class Board extends Component<IBoardProps, IBoardState> {
     yRemove: number,
     xSet: number,
     ySet: number,
-    piece: string
+    piece: string,
+    color: string
   ) {
     let board = this.state.board;
     let lastMove = {
       piece: piece,
+      color: color,
       first_move: !board[yRemove][xRemove].has_moved,
       fromX: xRemove,
       fromY: yRemove,
@@ -132,8 +156,24 @@ export default class Board extends Component<IBoardProps, IBoardState> {
       toY: ySet
     };
 
-    board[yRemove][xRemove] = { piece: "", has_moved: true };
-    board[ySet][xSet] = { piece: piece, has_moved: true };
+    board[yRemove][xRemove] = {
+      piece: "",
+      color: "",
+      has_moved: true,
+      possible_moves: [],
+      is_special: [],
+      covered: [],
+      show_overlay: false
+    };
+    board[ySet][xSet] = {
+      piece: piece,
+      color: color,
+      has_moved: true,
+      possible_moves: [],
+      is_special: [],
+      covered: [],
+      show_overlay: false
+    };
 
     this.setState({ board: board, last_move: lastMove });
   }
@@ -168,7 +208,10 @@ export default class Board extends Component<IBoardProps, IBoardState> {
     this.setState({ board: board });
   }*/
 
-  calculateAllMoves() {
+  /* calculateAllMoves(
+    board: { piece: string; has_moved: any }[][],
+    coveredSquares: string[][][]
+  ) {
     let states = [] as string[][][];
     for (let y = 0; y < 8; y++) {
       states[y] = [];
@@ -177,30 +220,62 @@ export default class Board extends Component<IBoardProps, IBoardState> {
       }
     }
 
+    let inCheckDark = this.inCheck("dark", board, coveredSquares);
+    let inCheckLight = this.inCheck("light", board, coveredSquares);
+
     for (let y = 0; y < 8; y++) {
       for (let x = 0; x < 8; x++) {
-        this.boardRefs[y][x].current.calculateMoves();
+        if (board[y][x].piece.endsWith("dark")) {
+          this.boardRefs[y][x].current.calculateMoves(inCheckDark);
+        } else if (board[y][x].piece.endsWith("light")) {
+          this.boardRefs[y][x].current.calculateMoves(inCheckLight);
+        }
+
         let coveredSquares = this.boardRefs[y][
           x
         ].current.calculateCoveredSquares();
 
         coveredSquares.map((i: any) => {
-          states[i[1]][i[0]].push(this.state.board[y][x].piece);
+          states[i[1]][i[0]].push(board[y][x].piece);
         });
       }
     }
 
-    if (JSON.stringify(states) !== JSON.stringify(this.state.covered_squares)) {
-      this.setState({ covered_squares: states });
-    }
+    return states;
   }
+
+  inCheck(
+    color: string,
+    board: { piece: string; has_moved: any }[][],
+    coveredSquares: string[][][]
+  ) {
+    for (let y = 0; y < 8; y++) {
+      for (let x = 0; x < 8; x++) {
+        if (board[y][x].piece == "king_" + color) {
+          for (let i = 0; i < coveredSquares[y][x].length; i++) {
+            if (!coveredSquares[y][x][i].endsWith(color)) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+
+    return false;
+  }
+*/
 
   render() {
     let board = [] as any[][];
     for (let y = 0; y < 8; y++) {
       board[y] = [];
       for (let x = 0; x < 8; x++) {
-        board[y][x] = this.makeSquare(x, y, this.state.board[y][x]);
+        board[y][x] = this.makeSquare(
+          x,
+          y,
+          this.state.board[y][x].piece,
+          this.state.board[y][x].color
+        );
       }
     }
 

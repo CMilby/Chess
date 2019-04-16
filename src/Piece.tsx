@@ -1,23 +1,32 @@
 import React, { Component } from "react";
 
 export interface IPieceProps {
-  piece_type: string;
-  has_moved_piece: boolean;
+  piece: string;
+  color: string;
   x: number;
   y: number;
 
   set_overlay_callback: any;
 
-  board: { piece: string; has_moved: boolean }[][];
-  covered_squares: string[][][];
-
-  last_move: any;
+  board: {
+    piece: string;
+    color: string;
+    has_moved: boolean;
+    possible_moves: number[][];
+    is_special: string[];
+    covered: string[];
+  }[][];
+  last_move: {
+    fromX: number;
+    fromY: number;
+    toX: number;
+    toY: number;
+    piece: string;
+    color: string;
+  };
 }
 
-export interface IPieceState {
-  possible_moves: number[][];
-  is_special_move: string[];
-}
+export interface IPieceState {}
 
 export default class Piece extends Component<IPieceProps, IPieceState> {
   constructor(props: any) {
@@ -29,58 +38,28 @@ export default class Piece extends Component<IPieceProps, IPieceState> {
     };
   }
 
-  recalculateCoveredSquares() {
-    return this.getCoveredSquares();
-  }
-
-  recalculatePossibleMoves() {
-    let possibleMoves = this.getPossibleMoves();
-    if (
-      JSON.stringify(possibleMoves) !==
-      JSON.stringify(this.state.possible_moves)
-    ) {
-      this.setState({
-        possible_moves: possibleMoves.moves,
-        is_special_move: possibleMoves.is_special
-      });
-    }
-  }
-
   onDragStart(e: any) {
+    let square = this.props.board[this.props.y][this.props.x];
+
     e.dataTransfer.effectAllowed = "move";
     e.dataTransfer.setData("text/x", e.target.getAttribute("data-x"));
     e.dataTransfer.setData("text/y", e.target.getAttribute("data-y"));
     e.dataTransfer.setData("text/piece", e.target.getAttribute("data-piece"));
-    e.dataTransfer.setData("text/moves", this.state.possible_moves);
-    e.dataTransfer.setData("text/special", this.state.is_special_move);
+    e.dataTransfer.setData("text/color", e.target.getAttribute("data-color"));
+    e.dataTransfer.setData("text/moves", square.possible_moves);
+    e.dataTransfer.setData("text/special", square.is_special);
 
-    for (let i = 0; i < this.state.possible_moves.length; i++) {
+    for (let i = 0; i < square.possible_moves.length; i++) {
       this.props.set_overlay_callback(
-        this.state.possible_moves[i][0],
-        this.state.possible_moves[i][1],
+        square.possible_moves[i][0],
+        square.possible_moves[i][1],
         true
       );
     }
   }
 
-  getCoveredSquares() {
-    return [] as number[][];
-  }
-
-  getAllMoves() {
-    return [] as number[][];
-  }
-
-  getPossibleMoves() {
-    return { moves: [] as number[][], is_special: [] as string[] };
-  }
-
-  canPieceMove(toX: number, toY: number) {
-    return 0;
-  }
-
-  pieceImg(type: string) {
-    if (type != "") {
+  pieceImg() {
+    if (this.props.piece != "") {
       return (
         <div
           className="piece-square draggable"
@@ -88,14 +67,17 @@ export default class Piece extends Component<IPieceProps, IPieceState> {
           onDragStart={e => this.onDragStart(e)}
         >
           <img
-            data-piece={this.props.piece_type}
+            data-piece={this.props.piece}
+            data-color={this.props.color}
             data-x={this.props.x}
             data-y={this.props.y}
             className="piece-img"
             src={
               process.env.PUBLIC_URL +
               "/pieces/" +
-              this.props.piece_type +
+              this.props.piece +
+              "_" +
+              this.props.color +
               ".png"
             }
           />
@@ -107,7 +89,6 @@ export default class Piece extends Component<IPieceProps, IPieceState> {
   }
 
   render() {
-    let img = this.pieceImg(this.props.piece_type);
-    return <div>{img}</div>;
+    return <div>{this.pieceImg()}</div>;
   }
 }

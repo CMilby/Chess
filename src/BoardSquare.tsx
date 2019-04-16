@@ -3,45 +3,43 @@ import React, { Component } from "react";
 import Overlay from "./Overlay";
 
 import Piece from "./Piece";
-import Knight from "./pieces/Knight";
-import Rook from "./pieces/Rook";
-import Pawn from "./pieces/Pawn";
-import Bishop from "./pieces/Bishop";
-import Queen from "./pieces/Queen";
-import King from "./pieces/King";
 
 export interface IBoardSquareProps {
   x: number;
   y: number;
-  piece_type: string;
-  piece_has_moved: boolean;
+  piece: string;
+  color: string;
 
   set_overlay_callback: any;
   set_and_remove_callback: any;
 
-  board: { piece: string; has_moved: boolean }[][];
-  covered_squares: string[][][];
-
-  last_move: any;
+  board: {
+    piece: string;
+    color: string;
+    has_moved: boolean;
+    possible_moves: number[][];
+    is_special: string[];
+    covered: string[];
+    show_overlay: boolean;
+  }[][];
+  last_move: {
+    fromX: number;
+    fromY: number;
+    toX: number;
+    toY: number;
+    piece: string;
+    color: string;
+  };
 }
 
-export interface IBoardSquareState {
-  show_overlay: boolean;
-}
+export interface IBoardSquareState {}
 
 export default class BoardSquare extends Component<
   IBoardSquareProps,
   IBoardSquareState
 > {
-  private pieceRef: React.RefObject<any>;
   constructor(props: any) {
     super(props);
-
-    this.state = {
-      show_overlay: false
-    };
-
-    this.pieceRef = React.createRef();
   }
 
   onDragOver(e: any) {
@@ -50,6 +48,7 @@ export default class BoardSquare extends Component<
 
   onDrop(e: any) {
     let piece = e.dataTransfer.getData("text/piece");
+    let color = e.dataTransfer.getData("text/color");
     let oldX = e.dataTransfer.getData("text/x") as number;
     let oldY = e.dataTransfer.getData("text/y") as number;
 
@@ -83,17 +82,18 @@ export default class BoardSquare extends Component<
         oldY,
         this.props.x,
         this.props.y,
-        piece
+        piece,
+        color
       );
 
       if (special == "OO_light") {
-        this.props.set_and_remove_callback(7, 0, 5, 0, "rook_light");
+        this.props.set_and_remove_callback(7, 0, 5, 0, "rook", "light");
       } else if (special == "OOO_light") {
-        this.props.set_and_remove_callback(0, 0, 3, 0, "rook_light");
+        this.props.set_and_remove_callback(0, 0, 3, 0, "rook", "light");
       } else if (special == "OO_dark") {
-        this.props.set_and_remove_callback(7, 7, 5, 7, "rook_dark");
+        this.props.set_and_remove_callback(7, 7, 5, 7, "rook", "dark");
       } else if (special == "OOO_dark") {
-        this.props.set_and_remove_callback(0, 7, 3, 7, "rook_dark");
+        this.props.set_and_remove_callback(0, 7, 3, 7, "rook", "dark");
       } else if (special.startsWith("en_passant")) {
         let tokens = special.split("_");
         this.props.set_and_remove_callback(
@@ -107,118 +107,18 @@ export default class BoardSquare extends Component<
     }
   }
 
-  getPiece(piece_type: string) {
-    if (piece_type.startsWith("knight")) {
-      return (
-        <Knight
-          piece_type={piece_type}
-          x={this.props.x}
-          y={this.props.y}
-          has_moved_piece={this.props.piece_has_moved}
-          board={this.props.board}
-          covered_squares={this.props.covered_squares}
-          set_overlay_callback={this.props.set_overlay_callback}
-          last_move={this.props.last_move}
-          ref={this.pieceRef}
-        />
-      );
-    } else if (piece_type.startsWith("rook")) {
-      return (
-        <Rook
-          piece_type={piece_type}
-          x={this.props.x}
-          y={this.props.y}
-          has_moved_piece={this.props.piece_has_moved}
-          board={this.props.board}
-          covered_squares={this.props.covered_squares}
-          set_overlay_callback={this.props.set_overlay_callback}
-          last_move={this.props.last_move}
-          ref={this.pieceRef}
-        />
-      );
-    } else if (piece_type.startsWith("pawn")) {
-      return (
-        <Pawn
-          piece_type={piece_type}
-          x={this.props.x}
-          y={this.props.y}
-          has_moved_piece={this.props.piece_has_moved}
-          board={this.props.board}
-          covered_squares={this.props.covered_squares}
-          set_overlay_callback={this.props.set_overlay_callback}
-          last_move={this.props.last_move}
-          ref={this.pieceRef}
-        />
-      );
-    } else if (piece_type.startsWith("bishop")) {
-      return (
-        <Bishop
-          piece_type={piece_type}
-          x={this.props.x}
-          y={this.props.y}
-          has_moved_piece={this.props.piece_has_moved}
-          board={this.props.board}
-          covered_squares={this.props.covered_squares}
-          set_overlay_callback={this.props.set_overlay_callback}
-          last_move={this.props.last_move}
-          ref={this.pieceRef}
-        />
-      );
-    } else if (piece_type.startsWith("queen")) {
-      return (
-        <Queen
-          piece_type={piece_type}
-          x={this.props.x}
-          y={this.props.y}
-          has_moved_piece={this.props.piece_has_moved}
-          board={this.props.board}
-          covered_squares={this.props.covered_squares}
-          set_overlay_callback={this.props.set_overlay_callback}
-          last_move={this.props.last_move}
-          ref={this.pieceRef}
-        />
-      );
-    } else if (piece_type.startsWith("king")) {
-      return (
-        <King
-          piece_type={piece_type}
-          x={this.props.x}
-          y={this.props.y}
-          has_moved_piece={this.props.piece_has_moved}
-          board={this.props.board}
-          covered_squares={this.props.covered_squares}
-          set_overlay_callback={this.props.set_overlay_callback}
-          last_move={this.props.last_move}
-          ref={this.pieceRef}
-        />
-      );
-    }
-
+  getPiece() {
     return (
       <Piece
-        piece_type={piece_type}
+        piece={this.props.piece}
+        color={this.props.color}
         x={this.props.x}
         y={this.props.y}
-        has_moved_piece={this.props.piece_has_moved}
-        board={this.props.board}
-        covered_squares={this.props.covered_squares}
         set_overlay_callback={this.props.set_overlay_callback}
+        board={this.props.board}
         last_move={this.props.last_move}
-        ref={this.pieceRef}
       />
     );
-  }
-
-  setOverlay(show: boolean) {
-    this.setState({ show_overlay: show });
-  }
-
-  calculateMoves() {
-    this.pieceRef.current.recalculatePossibleMoves();
-  }
-
-  calculateCoveredSquares() {
-    return this.pieceRef.current.recalculateCoveredSquares();
   }
 
   render() {
@@ -233,7 +133,7 @@ export default class BoardSquare extends Component<
     }
 
     let overlay = <div />;
-    if (this.state.show_overlay) {
+    if (this.props.board[y][x].show_overlay) {
       overlay = <Overlay color="green" x={this.props.x} y={this.props.y} />;
     }
 
@@ -245,7 +145,7 @@ export default class BoardSquare extends Component<
         onDrop={e => this.onDrop(e)}
       >
         <div>{overlay}</div>
-        <div>{this.getPiece(this.props.piece_type)}</div>
+        <div>{this.getPiece()}</div>
       </td>
     );
   }
