@@ -5,6 +5,7 @@ import BoardSquare from "./BoardSquare";
 import { calculateAllMoves } from "./Game";
 
 import "./Board.css";
+import { allSettled } from "q";
 
 export interface IBoardProps {}
 
@@ -25,6 +26,21 @@ export interface IBoardState {
       y: number;
     };
   }[][];
+  game: {
+    move: string;
+    light: {
+      in_check: boolean;
+      in_checkmate: boolean;
+      x: number;
+      y: number;
+    };
+    dark: {
+      in_check: boolean;
+      in_checkmate: boolean;
+      x: number;
+      y: number;
+    };
+  };
   last_move: {
     fromX: number;
     fromY: number;
@@ -53,6 +69,21 @@ export default class Board extends Component<IBoardProps, IBoardState> {
         color: "light",
         x: -1,
         y: -1
+      },
+      game: {
+        move: "white",
+        light: {
+          in_check: false,
+          in_checkmate: false,
+          x: -1,
+          y: -1
+        },
+        dark: {
+          in_check: false,
+          in_checkmate: false,
+          x: -1,
+          y: -1
+        }
       }
     };
 
@@ -81,11 +112,11 @@ export default class Board extends Component<IBoardProps, IBoardState> {
   }
 
   componentDidMount() {
-    calculateAllMoves(this.state.board, this.state.last_move);
+    calculateAllMoves(this.state.board, this.state.last_move, this.state.game);
   }
 
   componentDidUpdate() {
-    calculateAllMoves(this.state.board, this.state.last_move);
+    calculateAllMoves(this.state.board, this.state.last_move, this.state.game);
   }
 
   setupGame(x: number, y: number) {

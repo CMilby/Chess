@@ -23,6 +23,8 @@ import {
   pawnPossibleMoves
 } from "./pieces_logic/PawnLogic";
 
+import cloneDeep from "lodash/cloneDeep";
+
 export function calculateAllMoves(
   board: {
     piece: string;
@@ -32,6 +34,13 @@ export function calculateAllMoves(
     is_special: string[];
     covered: string[];
     show_overlay: boolean;
+    overlay: {
+      type: string;
+      piece: string;
+      color: string;
+      x: number;
+      y: number;
+    };
   }[][],
   lastMove: {
     fromX: number;
@@ -40,6 +49,21 @@ export function calculateAllMoves(
     toY: number;
     piece: string;
     color: string;
+  },
+  game: {
+    move: string;
+    light: {
+      in_check: boolean;
+      in_checkmate: boolean;
+      x: number;
+      y: number;
+    };
+    dark: {
+      in_check: boolean;
+      in_checkmate: boolean;
+      x: number;
+      y: number;
+    };
   }
 ) {
   let coveredSquares = calculateCoveredSquares(board);
@@ -49,6 +73,11 @@ export function calculateAllMoves(
     }
   }
 
+  game.light = isInCheck("light", board);
+  game.dark = isInCheck("dark", board);
+
+  let totalPossibleMovesDark = 0;
+  let totalPossibleMovesLight = 0;
   for (let y = 0; y < 8; y++) {
     for (let x = 0; x < 8; x++) {
       let possibleMoves = {
@@ -75,12 +104,104 @@ export function calculateAllMoves(
         );
       }
 
+      if (
+        game.dark.in_check &&
+        board[y][x].piece != "" &&
+        board[y][x].color == "dark"
+      ) {
+        removeNonCheckBlockingMoves(
+          x,
+          y,
+          game.dark.x,
+          game.dark.y,
+          possibleMoves,
+          board
+        );
+      } else if (
+        game.light.in_check &&
+        board[y][x].piece != "" &&
+        board[y][x].color == "light"
+      ) {
+        removeNonCheckBlockingMoves(
+          x,
+          y,
+          game.light.x,
+          game.light.y,
+          possibleMoves,
+          board
+        );
+      }
+
       board[y][x].possible_moves = possibleMoves.moves;
       board[y][x].is_special = possibleMoves.is_special;
+
+      if (board[y][x].color == "light") {
+        totalPossibleMovesLight += possibleMoves.moves.length;
+      } else if (board[y][x].color == "dark") {
+        totalPossibleMovesDark += possibleMoves.moves.length;
+      }
     }
   }
 
+  if (totalPossibleMovesLight == 0) {
+    game.light.in_checkmate = true;
+  } else if (totalPossibleMovesDark == 0) {
+    game.dark.in_checkmate = true;
+  }
+
+  console.log(totalPossibleMovesLight);
+  console.log(totalPossibleMovesDark);
+
   return board;
+}
+
+function removeNonCheckBlockingMoves(
+  x: number,
+  y: number,
+  xCheckPos: number,
+  yCheckPos: number,
+  possibleMoves: { moves: number[][]; is_special: string[] },
+  board: {
+    piece: string;
+    color: string;
+    has_moved: boolean;
+    possible_moves: number[][];
+    is_special: string[];
+    covered: string[];
+    show_overlay: boolean;
+    overlay: {
+      type: string;
+      piece: string;
+      color: string;
+      x: number;
+      y: number;
+    };
+  }[][]
+) {
+  for (let i = 0; i < possibleMoves.moves.length; i++) {
+    let myBoard = cloneDeep(board);
+    let boardAndLastMove = setAndRemovePiece(
+      myBoard,
+      x,
+      y,
+      possibleMoves.moves[i][0],
+      possibleMoves.moves[i][1],
+      myBoard[y][x].piece,
+      myBoard[y][x].color
+    );
+
+    let coveredSquares = calculateCoveredSquares(boardAndLastMove.board);
+    let coveredAtPos = coveredSquares[yCheckPos][xCheckPos];
+
+    for (let j = 0; j < coveredAtPos.length; j++) {
+      if (coveredAtPos[j] != board[y][x].color) {
+        possibleMoves.moves.splice(i, 1);
+        possibleMoves.is_special.splice(i, 1);
+        i--;
+        break;
+      }
+    }
+  }
 }
 
 export function calculateCoveredSquares(
@@ -92,6 +213,13 @@ export function calculateCoveredSquares(
     is_special: string[];
     covered: string[];
     show_overlay: boolean;
+    overlay: {
+      type: string;
+      piece: string;
+      color: string;
+      x: number;
+      y: number;
+    };
   }[][]
 ) {
   let coveredSquares = [] as string[][][];
@@ -158,15 +286,86 @@ export function isInCheck(
 ) {
   for (let y = 0; y < 8; y++) {
     for (let x = 0; x < 8; x++) {
-      if (board[y][x].piece == "king_" + color) {
+      if (board[y][x].piece == "king" && board[y][x].color == color) {
         for (let i = 0; i < board[y][x].covered.length; i++) {
           if (board[y][x].covered[i] != color) {
-            return true;
+            return { in_check: true, in_checkmate: false, x: x, y: y };
           }
         }
       }
     }
   }
 
-  return false;
+  return { in_check: false, in_checkmate: false, x: -1, y: -1 };
+}
+
+export function setAndRemovePiece(
+  board: {
+    piece: string;
+    color: string;
+    has_moved: boolean;
+    possible_moves: number[][];
+    is_special: string[];
+    covered: string[];
+    show_overlay: boolean;
+    overlay: {
+      type: string;
+      piece: string;
+      color: string;
+      x: number;
+      y: number;
+    };
+  }[][],
+  xRemove: number,
+  yRemove: number,
+  xSet: number,
+  ySet: number,
+  piece: string,
+  color: string
+) {
+  let lastMove = {
+    piece: piece,
+    color: color,
+    first_move: !board[yRemove][xRemove].has_moved,
+    fromX: xRemove,
+    fromY: yRemove,
+    toX: xSet,
+    toY: ySet
+  };
+
+  board[yRemove][xRemove] = {
+    piece: "",
+    color: "",
+    has_moved: true,
+    possible_moves: [],
+    is_special: [],
+    covered: [],
+    show_overlay: false,
+    overlay: {
+      type: "move",
+      piece: "",
+      color: "",
+      x: -1,
+      y: -1
+    }
+  };
+
+  board[ySet][xSet] = {
+    piece: piece,
+    color: color,
+    has_moved: true,
+    possible_moves: [],
+    is_special: [],
+    covered: [],
+    show_overlay: false,
+    overlay: {
+      type: "move",
+      piece: "",
+      color: "",
+      x: -1,
+      y: -1
+    }
+  };
+
+  return { board: board, last_move: lastMove };
 }
