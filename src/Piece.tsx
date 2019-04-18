@@ -89,6 +89,6 @@ export default class Piece extends Component<IPieceProps, IPieceState> {
   }
 
   render() {
-    return <div>{this.pieceImg()}</div>;
+    return this.pieceImg();
   }
 }

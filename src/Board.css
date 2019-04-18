@@ -1,29 +1,44 @@
 .board-parent {
-  margin-left: 100px;
-  margin-top: 100px;
+  position: relative;
 }
 
 .board {
+  width: 100%;
   border-collapse: collapse;
 }
 
 .board-square {
-  width: 5vw;
-  height: 5vw;
-  padding: 0vw;
-  margin: 0vw;
+  width: 100%;
   position: relative;
 }
 
+.board-square-td {
+  padding: 0px;
+}
+
+.board-square:before {
+  content: "";
+  display: block;
+  padding-top: 100%;
+}
+
+.board-square-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
 .piece-square {
-  width: 5vw;
-  height: 5vw;
+  width: 100%;
+  height: 100%;
 }
 
 .piece-img {
   margin: 0vw;
-  width: 5vw;
-  height: 5vw;
+  width: 100%;
+  height: 100%;
 }
 
 .even-square {
@@ -63,9 +78,62 @@
   outline: none;
 }
 
-.promotion-modal {
-  width: 6vw;
-  height: 21vw;
-  background-color: #757575;
-  border-radius: 0.5vw;
+.board-decorator-horizontal {
+  width: 5vw;
+  height: 1vw;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.board-decorator-vertical {
+  width: 1vw;
+  text-align: center;
+  vertical-align: text-bottom;
+}
+
+.game-over-modal-root {
+  position: absolute;
+  width: 25vw;
+  left: 7.75vw;
+  top: 12.5vw;
+
+  background-color: #d1d1d1;
+  border-color: #444444;
+  border-width: 2px;
+  border-style: solid;
+  border-radius: 1vw;
+}
+
+.game-over-header-h {
+  margin: 0.5vw;
+  text-align: center;
+}
+
+.game-over-br {
+  line-height: 0px;
+}
+
+.game-over-players {
+  margin: 0.5vw;
+  text-align: center;
+}
+
+.game-over-btn {
+  width: 100%;
+  height: 3vw;
+  font-size: 1.5vw;
+
+  background-color: #444444;
+  color: #ffffff;
+  border-radius: 0.25vw;
+  margin-bottom: 0.25vw;
+}
+
+.game-over-btn:focus {
+  outline-color: #a1a1a1;
+}
+
+.game-time-p {
+  margin: 0px;
+  text-align: right;
 }

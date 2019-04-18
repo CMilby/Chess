@@ -164,13 +164,15 @@ export default class BoardSquare extends Component<
 
     return (
       <td
-        className={classes}
+        className="board-square-td"
         key={"board_square_td_" + this.props.x + "_" + this.props.y}
         onDragOver={e => this.onDragOver(e)}
         onDrop={e => this.onDrop(e)}
       >
-        <div>{overlay}</div>
-        <div>{this.getPiece()}</div>
+        <div className={classes}>
+          <div>{overlay}</div>
+          <div className="board-square-content">{this.getPiece()}</div>
+        </div>
       </td>
     );
   }

@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 
 import BoardSquare from "./BoardSquare";
+import BoardDecorator from "./BoardDecorator";
 
 import { calculateAllMoves } from "./Game";
 
 import "./Board.css";
-import { allSettled } from "q";
 
 export interface IBoardProps {}
 
@@ -324,17 +324,131 @@ export default class Board extends Component<IBoardProps, IBoardState> {
     }
 
     return (
-      <div id="board" className="board-parent">
+      <div id="board" className="board-parent-position">
         <table className="board">
           <tbody>
-            <tr>{board[7]}</tr>
-            <tr>{board[6]}</tr>
-            <tr>{board[5]}</tr>
-            <tr>{board[4]}</tr>
-            <tr>{board[3]}</tr>
-            <tr>{board[2]}</tr>
-            <tr>{board[1]}</tr>
-            <tr>{board[0]}</tr>
+            <tr>
+              {board[7]}
+              <td>
+                <BoardDecorator
+                  type="board_space_identifier_vertical"
+                  position="8"
+                />
+              </td>
+            </tr>
+            <tr>
+              {board[6]}
+              <td>
+                <BoardDecorator
+                  type="board_space_identifier_vertical"
+                  position="7"
+                />
+              </td>
+            </tr>
+            <tr>
+              {board[5]}
+              <td>
+                <BoardDecorator
+                  type="board_space_identifier_vertical"
+                  position="6"
+                />
+              </td>
+            </tr>
+            <tr>
+              {board[4]}
+              <td>
+                <BoardDecorator
+                  type="board_space_identifier_vertical"
+                  position="5"
+                />
+              </td>
+            </tr>
+            <tr>
+              {board[3]}
+              <td>
+                <BoardDecorator
+                  type="board_space_identifier_vertical"
+                  position="4"
+                />
+              </td>
+            </tr>
+            <tr>
+              {board[2]}
+              <td>
+                <BoardDecorator
+                  type="board_space_identifier_vertical"
+                  position="3"
+                />
+              </td>
+            </tr>
+            <tr>
+              {board[1]}
+              <td>
+                <BoardDecorator
+                  type="board_space_identifier_vertical"
+                  position="2"
+                />
+              </td>
+            </tr>
+            <tr>
+              {board[0]}
+              <td>
+                <BoardDecorator
+                  type="board_space_identifier_vertical"
+                  position="1"
+                />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <BoardDecorator
+                  type="board_space_identifier_horizontal"
+                  position="a"
+                />
+              </td>
+              <td>
+                <BoardDecorator
+                  type="board_space_identifier_horizontal"
+                  position="b"
+                />
+              </td>
+              <td>
+                <BoardDecorator
+                  type="board_space_identifier_horizontal"
+                  position="c"
+                />
+              </td>
+              <td>
+                <BoardDecorator
+                  type="board_space_identifier_horizontal"
+                  position="d"
+                />
+              </td>
+              <td>
+                <BoardDecorator
+                  type="board_space_identifier_horizontal"
+                  position="e"
+                />
+              </td>
+              <td>
+                <BoardDecorator
+                  type="board_space_identifier_horizontal"
+                  position="f"
+                />
+              </td>
+              <td>
+                <BoardDecorator
+                  type="board_space_identifier_horizontal"
+                  position="g"
+                />
+              </td>
+              <td>
+                <BoardDecorator
+                  type="board_space_identifier_horizontal"
+                  position="h"
+                />
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
