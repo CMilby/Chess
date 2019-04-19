@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 
+import "./BoardDecorator.css";
+
 export interface IBoardDecoratorProps {
   type: string;
   position: any;
@@ -16,14 +18,14 @@ export default class BoardDecorator extends Component<
   }
 
   makeDecorator(type: string) {
-    if (type == "board_space_identifier_horizontal") {
+    if (type == "horizontal") {
       return (
         <div className="board-decorator-horizontal">{this.props.position}</div>
       );
-    } else if (type == "board_space_identifier_vertical") {
+    } else if (type == "vertical") {
       return (
         <div className="board-decorator-vertical">
-          <span>{this.props.position}</span>
+          <div>{this.props.position}</div>
         </div>
       );
     }

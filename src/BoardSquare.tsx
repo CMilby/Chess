@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Col } from "reactstrap";
 
 import Overlay from "./Overlay";
 
@@ -14,6 +15,7 @@ export interface IBoardSquareProps {
   set_and_remove_callback: any;
   promotion_overlay_show_callback: any;
   promotion_overlay_click_callback: any;
+  change_turn_callback: any;
 
   board: {
     piece: string;
@@ -95,6 +97,8 @@ export default class BoardSquare extends Component<
         color
       );
 
+      this.props.change_turn_callback();
+
       if (special == "OO_light") {
         this.props.set_and_remove_callback(7, 0, 5, 0, "rook", "light");
       } else if (special == "OOO_light") {
@@ -163,17 +167,19 @@ export default class BoardSquare extends Component<
     }
 
     return (
-      <td
-        className="board-square-td"
+      <Col
+        className="board-square-td col-xs-18"
         key={"board_square_td_" + this.props.x + "_" + this.props.y}
         onDragOver={e => this.onDragOver(e)}
         onDrop={e => this.onDrop(e)}
       >
         <div className={classes}>
-          <div>{overlay}</div>
-          <div className="board-square-content">{this.getPiece()}</div>
+          <div className="board-square-content">
+            {overlay}
+            {this.getPiece()}
+          </div>
         </div>
-      </td>
+      </Col>
     );
   }
 }

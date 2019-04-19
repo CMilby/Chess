@@ -1,5 +1,7 @@
 import React from "react";
 
+import "./Overlay.css";
+
 export interface IOverlayProps {
   color: string;
   x: number;
@@ -55,7 +57,7 @@ export default class Overlay extends React.Component<
             onClick={e => this.handleClick(overlay.piece, overlay.x, overlay.y)}
           >
             <img
-              className="piece-img"
+              className="piece-overlay-img"
               src={
                 process.env.PUBLIC_URL +
                 "/pieces/" +
@@ -74,6 +76,6 @@ export default class Overlay extends React.Component<
   }
 
   render() {
-    return <div>{this.makeOverlay(this.props.overlay)}</div>;
+    return this.makeOverlay(this.props.overlay);
   }
 }

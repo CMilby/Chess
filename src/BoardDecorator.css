@@ -1,0 +1,12 @@
+.board-decorator-horizontal {
+  width: 100%;
+  padding: 0px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.board-decorator-vertical {
+  padding-left: 5px;
+  display: table-cell;
+  vertical-align: middle;
+}

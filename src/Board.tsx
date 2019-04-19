@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Container, Row, Col } from "reactstrap";
 
 import BoardSquare from "./BoardSquare";
 import BoardDecorator from "./BoardDecorator";
@@ -7,7 +8,24 @@ import { calculateAllMoves } from "./Game";
 
 import "./Board.css";
 
-export interface IBoardProps {}
+export interface IBoardProps {
+  game: {
+    move: string;
+    increment_millis: number;
+    light: {
+      in_check: boolean;
+      in_checkmate: boolean;
+      x: number;
+      y: number;
+    };
+    dark: {
+      in_check: boolean;
+      in_checkmate: boolean;
+      x: number;
+      y: number;
+    };
+  };
+}
 
 export interface IBoardState {
   board: {
@@ -26,21 +44,6 @@ export interface IBoardState {
       y: number;
     };
   }[][];
-  game: {
-    move: string;
-    light: {
-      in_check: boolean;
-      in_checkmate: boolean;
-      x: number;
-      y: number;
-    };
-    dark: {
-      in_check: boolean;
-      in_checkmate: boolean;
-      x: number;
-      y: number;
-    };
-  };
   last_move: {
     fromX: number;
     fromY: number;
@@ -69,21 +72,6 @@ export default class Board extends Component<IBoardProps, IBoardState> {
         color: "light",
         x: -1,
         y: -1
-      },
-      game: {
-        move: "white",
-        light: {
-          in_check: false,
-          in_checkmate: false,
-          x: -1,
-          y: -1
-        },
-        dark: {
-          in_check: false,
-          in_checkmate: false,
-          x: -1,
-          y: -1
-        }
       }
     };
 
@@ -112,11 +100,11 @@ export default class Board extends Component<IBoardProps, IBoardState> {
   }
 
   componentDidMount() {
-    calculateAllMoves(this.state.board, this.state.last_move, this.state.game);
+    calculateAllMoves(this.state.board, this.state.last_move, this.props.game);
   }
 
   componentDidUpdate() {
-    calculateAllMoves(this.state.board, this.state.last_move, this.state.game);
+    calculateAllMoves(this.state.board, this.state.last_move, this.props.game);
   }
 
   setupGame(x: number, y: number) {
@@ -172,6 +160,14 @@ export default class Board extends Component<IBoardProps, IBoardState> {
     return { piece: piece, color: color };
   }
 
+  changeTurn() {
+    if (this.props.game.move == "light") {
+      this.props.game.move = "dark";
+    } else if (this.props.game.move == "dark") {
+      this.props.game.move = "light";
+    }
+  }
+
   makeSquare(x: number, y: number, piece: string, color: string) {
     return (
       <BoardSquare
@@ -186,6 +182,7 @@ export default class Board extends Component<IBoardProps, IBoardState> {
         promotion_overlay_click_callback={this.handlePromotionOverlayClick.bind(
           this
         )}
+        change_turn_callback={this.changeTurn.bind(this)}
         board={this.state.board}
         last_move={this.state.last_move}
       />
@@ -324,133 +321,84 @@ export default class Board extends Component<IBoardProps, IBoardState> {
     }
 
     return (
-      <div id="board" className="board-parent-position">
-        <table className="board">
-          <tbody>
-            <tr>
-              {board[7]}
-              <td>
-                <BoardDecorator
-                  type="board_space_identifier_vertical"
-                  position="8"
-                />
-              </td>
-            </tr>
-            <tr>
-              {board[6]}
-              <td>
-                <BoardDecorator
-                  type="board_space_identifier_vertical"
-                  position="7"
-                />
-              </td>
-            </tr>
-            <tr>
-              {board[5]}
-              <td>
-                <BoardDecorator
-                  type="board_space_identifier_vertical"
-                  position="6"
-                />
-              </td>
-            </tr>
-            <tr>
-              {board[4]}
-              <td>
-                <BoardDecorator
-                  type="board_space_identifier_vertical"
-                  position="5"
-                />
-              </td>
-            </tr>
-            <tr>
-              {board[3]}
-              <td>
-                <BoardDecorator
-                  type="board_space_identifier_vertical"
-                  position="4"
-                />
-              </td>
-            </tr>
-            <tr>
-              {board[2]}
-              <td>
-                <BoardDecorator
-                  type="board_space_identifier_vertical"
-                  position="3"
-                />
-              </td>
-            </tr>
-            <tr>
-              {board[1]}
-              <td>
-                <BoardDecorator
-                  type="board_space_identifier_vertical"
-                  position="2"
-                />
-              </td>
-            </tr>
-            <tr>
-              {board[0]}
-              <td>
-                <BoardDecorator
-                  type="board_space_identifier_vertical"
-                  position="1"
-                />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <BoardDecorator
-                  type="board_space_identifier_horizontal"
-                  position="a"
-                />
-              </td>
-              <td>
-                <BoardDecorator
-                  type="board_space_identifier_horizontal"
-                  position="b"
-                />
-              </td>
-              <td>
-                <BoardDecorator
-                  type="board_space_identifier_horizontal"
-                  position="c"
-                />
-              </td>
-              <td>
-                <BoardDecorator
-                  type="board_space_identifier_horizontal"
-                  position="d"
-                />
-              </td>
-              <td>
-                <BoardDecorator
-                  type="board_space_identifier_horizontal"
-                  position="e"
-                />
-              </td>
-              <td>
-                <BoardDecorator
-                  type="board_space_identifier_horizontal"
-                  position="f"
-                />
-              </td>
-              <td>
-                <BoardDecorator
-                  type="board_space_identifier_horizontal"
-                  position="g"
-                />
-              </td>
-              <td>
-                <BoardDecorator
-                  type="board_space_identifier_horizontal"
-                  position="h"
-                />
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div>
+        <Container>
+          <Row>
+            {board[7]}
+            <div className="col-xs-20 remove-padding">
+              <BoardDecorator type="vertical" position="8" />
+            </div>
+          </Row>
+          <Row>
+            {board[6]}
+            <div className="col-xs-20 remove-padding">
+              <BoardDecorator type="vertical" position="7" />
+            </div>
+          </Row>
+          <Row>
+            {board[5]}
+            <div className="col-xs-20 remove-padding">
+              <BoardDecorator type="vertical" position="6" />
+            </div>
+          </Row>
+          <Row>
+            {board[4]}
+            <div className="col-xs-20 remove-padding">
+              <BoardDecorator type="vertical" position="5" />
+            </div>
+          </Row>
+          <Row>
+            {board[3]}
+            <div className="col-xs-20 remove-padding">
+              <BoardDecorator type="vertical" position="4" />
+            </div>
+          </Row>
+          <Row>
+            {board[2]}
+            <div className="col-xs-20 remove-padding">
+              <BoardDecorator type="vertical" position="3" />
+            </div>
+          </Row>
+          <Row>
+            {board[1]}
+            <div className="col-xs-20 remove-padding">
+              <BoardDecorator type="vertical" position="2" />
+            </div>
+          </Row>
+          <Row>
+            {board[0]}
+            <div className="col-xs-20 remove-padding">
+              <BoardDecorator type="vertical" position="1" />
+            </div>
+          </Row>
+          <Row>
+            <Col className="col-xs-18">
+              <BoardDecorator type="horizontal" position="a" />
+            </Col>
+            <Col className="col-xs-18">
+              <BoardDecorator type="horizontal" position="b" />
+            </Col>
+            <Col className="col-xs-18">
+              <BoardDecorator type="horizontal" position="c" />
+            </Col>
+            <Col className="col-xs-18">
+              <BoardDecorator type="horizontal" position="d" />
+            </Col>
+            <Col className="col-xs-18">
+              <BoardDecorator type="horizontal" position="e" />
+            </Col>
+            <Col className="col-xs-18">
+              <BoardDecorator type="horizontal" position="f" />
+            </Col>
+            <Col className="col-xs-18">
+              <BoardDecorator type="horizontal" position="g" />
+            </Col>
+            <Col className="col-xs-18">
+              <BoardDecorator type="horizontal" position="h" />
+            </Col>
+            <div className="col-xs-20 remove-padding" />
+          </Row>
+        </Container>
       </div>
     );
   }

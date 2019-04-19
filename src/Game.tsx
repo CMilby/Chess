@@ -80,6 +80,10 @@ export function calculateAllMoves(
   let totalPossibleMovesLight = 0;
   for (let y = 0; y < 8; y++) {
     for (let x = 0; x < 8; x++) {
+      if (game.move != board[y][x].color) {
+        continue;
+      }
+
       let possibleMoves = {
         moves: [] as number[][],
         is_special: [] as string[]
