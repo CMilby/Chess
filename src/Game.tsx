@@ -52,6 +52,7 @@ export function calculateAllMoves(
   },
   game: {
     move: string;
+    increment_millis: number;
     light: {
       in_check: boolean;
       in_checkmate: boolean;

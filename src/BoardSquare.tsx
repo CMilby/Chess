@@ -97,8 +97,6 @@ export default class BoardSquare extends Component<
         color
       );
 
-      this.props.change_turn_callback();
-
       if (special == "OO_light") {
         this.props.set_and_remove_callback(7, 0, 5, 0, "rook", "light");
       } else if (special == "OOO_light") {
@@ -123,6 +121,8 @@ export default class BoardSquare extends Component<
           this.props.y
         );
       }
+
+      this.props.change_turn_callback();
     }
   }
 

@@ -9,6 +9,10 @@ import { calculateAllMoves } from "./Game";
 import "./Board.css";
 
 export interface IBoardProps {
+  subtract_time_callback: any;
+  add_time_callback: any;
+  set_turn_callback: any;
+
   game: {
     move: string;
     increment_millis: number;
@@ -61,6 +65,7 @@ export interface IBoardState {
 }
 
 export default class Board extends Component<IBoardProps, IBoardState> {
+  private timer: any;
   constructor(props: any) {
     super(props);
 
@@ -103,8 +108,22 @@ export default class Board extends Component<IBoardProps, IBoardState> {
     calculateAllMoves(this.state.board, this.state.last_move, this.props.game);
   }
 
-  componentDidUpdate() {
-    calculateAllMoves(this.state.board, this.state.last_move, this.props.game);
+  componentDidUpdate(prevProps: any, prevState: any) {
+    if (
+      JSON.stringify(this.state.last_move) !=
+      JSON.stringify(prevState.last_move)
+    ) {
+      this.clearAllCalculatedMoves();
+      calculateAllMoves(
+        this.state.board,
+        this.state.last_move,
+        this.props.game
+      );
+    }
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timer);
   }
 
   setupGame(x: number, y: number) {
@@ -160,11 +179,40 @@ export default class Board extends Component<IBoardProps, IBoardState> {
     return { piece: piece, color: color };
   }
 
+  tick(color: string) {
+    this.props.subtract_time_callback(color, 10);
+  }
+
+  startTimer(color: string) {
+    this.timer = setInterval(this.tick.bind(this, color), 10);
+  }
+
+  stopTimer() {
+    clearInterval(this.timer!);
+  }
+
   changeTurn() {
+    this.stopTimer();
+    this.props.add_time_callback(
+      this.props.game.move,
+      this.props.game.increment_millis
+    );
+
     if (this.props.game.move == "light") {
-      this.props.game.move = "dark";
+      this.props.set_turn_callback("dark");
     } else if (this.props.game.move == "dark") {
-      this.props.game.move = "light";
+      this.props.set_turn_callback("light");
+    }
+
+    this.startTimer(this.props.game.move);
+  }
+
+  clearAllCalculatedMoves() {
+    for (let y = 0; y < 8; y++) {
+      for (let x = 0; x < 8; x++) {
+        this.state.board[y][x].possible_moves = [];
+        this.state.board[y][x].is_special = [];
+      }
     }
   }
 
