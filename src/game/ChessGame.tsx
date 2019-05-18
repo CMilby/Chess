@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Container, Col, Row } from "reactstrap";
+import { Client } from "@stomp/stompjs";
 
 import Board from "./Board";
 import GameOverModal from "./GameOverModal";
@@ -78,6 +79,38 @@ export default class ChessGame extends Component<
         }
       }
     };
+  }
+
+  testFunc1() {
+    console.log("THIS IS A TEST 1");
+  }
+
+  testFunc2() {
+    console.log("THIS IS A TEST 2");
+  }
+
+  componentDidMount() {
+    let client = new Client();
+    client.configure({
+      brokerURL: "ws://localhost:8080/chess/websocket",
+      onConnect: () => {
+        console.log("connected");
+
+        client.subscribe("/topic/chess/update/abcd", message => {
+          console.log(message.body);
+        });
+
+        client.publish({
+          destination: "/app/chess/abcd",
+          body: "Hello, World!"
+        });
+      },
+      debug: str => {
+        console.log(str);
+      }
+    });
+
+    client.activate();
   }
 
   setTurn(color: string) {

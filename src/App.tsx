@@ -1,12 +1,30 @@
 import React, { Component } from "react";
+import { BrowserRouter as Router } from "react-router-dom";
 
-import ChessGame from "./ChessGame";
+import Routes from "./Routes";
 
-export default class App extends Component {
+export interface IAppProps {}
+
+export interface IAppState {}
+
+export default class App extends Component<IAppProps, IAppState> {
+  constructor(props: any) {
+    super(props);
+
+    this.state = {
+      auth: {
+        is_authenticated: false,
+        user: null
+      }
+    };
+  }
+
   render() {
     return (
       <div>
-        <ChessGame />
+        <Router>
+          <Routes />
+        </Router>
       </div>
     );
   }

@@ -1,27 +1,27 @@
 import {
   kingCoveredSquares,
   kingPossibleMoves
-} from "./pieces_logic/KingLogic";
+} from "../pieces_logic/KingLogic";
 import {
   queenCoveredSquares,
   queenPossibleMoves
-} from "./pieces_logic/QueenLogic";
+} from "../pieces_logic/QueenLogic";
 import {
   rookCoveredSquares,
   rookPossibleMoves
-} from "./pieces_logic/RookLogic";
+} from "../pieces_logic/RookLogic";
 import {
   bishopCoveredSquares,
   bishopPossibleMoves
-} from "./pieces_logic/BishopLogic";
+} from "../pieces_logic/BishopLogic";
 import {
   knightCoveredSquares,
   knightPossibleMoves
-} from "./pieces_logic/KnightLogic";
+} from "../pieces_logic/KnightLogic";
 import {
   pawnCoveredSquares,
   pawnPossibleMoves
-} from "./pieces_logic/PawnLogic";
+} from "../pieces_logic/PawnLogic";
 
 import cloneDeep from "lodash/cloneDeep";
 

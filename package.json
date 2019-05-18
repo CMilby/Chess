@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@material-ui/core": "^3.9.3",
+    "@stomp/stompjs": "^5.3.0",
     "@types/jest": "24.0.11",
     "@types/lodash": "^4.14.123",
     "@types/material-ui": "^0.21.6",
@@ -11,14 +12,21 @@
     "@types/react": "16.8.10",
     "@types/react-dom": "16.8.3",
     "@types/react-modal": "^3.8.2",
+    "@types/react-router-dom": "^4.3.2",
     "@types/reactstrap": "^8.0.1",
+    "axios": "^0.18.0",
     "bootstrap": "^4.3.1",
     "lodash": "^4.17.11",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-modal": "^3.8.1",
+    "react-router-dom": "^5.0.0",
     "react-scripts": "2.1.8",
     "reactstrap": "^8.0.0",
+    "socket.io": "^2.2.0",
+    "socket.io-client": "^2.2.0",
+    "sockjs": "^0.3.19",
+    "stompjs": "^2.3.3",
     "typescript": "3.3.4000"
   },
   "scripts": {
@@ -35,5 +43,6 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "proxy": "http://localhost:8080"
 }
