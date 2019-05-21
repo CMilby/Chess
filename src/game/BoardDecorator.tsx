@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import "./BoardDecorator.css";
+import "../resc/css/BoardDecorator.css";
 
 export interface IBoardDecoratorProps {
   type: string;

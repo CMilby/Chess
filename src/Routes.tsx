@@ -8,10 +8,11 @@ import {
 
 import Header from "./header/Header";
 
-import Home from "./Home";
-import ChessGame from "./game/ChessGame";
+import HomeComponent from "./components/HomeComponent";
+import JoinGameComponent from "./components/JoinGameComponent";
+import ChessGameComponent from "./components/game/ChessGameComponent";
 
-import { Auth } from "./objects/Auth";
+import { Auth } from "./resc/obj/Auth";
 import { getCurrentUser } from "./util/APIUtil";
 
 import { ACCESS_TOKEN } from "./constants";
@@ -71,8 +72,20 @@ class RoutesImpl extends Component<IRoutesProps, IRoutesState> {
           handle_login={this.handleLogin.bind(this)}
           handle_logout={this.handleLogout.bind(this)}
         />
-        <Route path="/" exact component={Home} />
-        <Route path="/play" component={ChessGame} />
+        <Route
+          path="/"
+          exact
+          component={() => (
+            <HomeComponent
+              auth={this.state.auth}
+              history={this.props.history}
+              location={this.props.location}
+              match={this.props.match}
+            />
+          )}
+        />
+        <Route path="/game/join" component={JoinGameComponent} />
+        <Route path="/game/play" component={ChessGameComponent} />
       </div>
     );
   }

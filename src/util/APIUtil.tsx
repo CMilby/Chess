@@ -5,80 +5,23 @@ const request = (
   options: { url: string; method: string; body?: any },
   auth: boolean = true
 ) => {
-  const headers = new Headers({
-    "Content-Type": "application/json"
-  });
+  let headers = {
+    "Content-Type": "application/json",
+    Accept: "application/json"
+  };
 
-  // console.log(headers);
-
-  if (localStorage.getItem(ACCESS_TOKEN) && auth) {
-    headers.append(
-      "Authorization",
-      "Bearer " + localStorage.getItem(ACCESS_TOKEN)
-    );
+  if (auth && localStorage.getItem(ACCESS_TOKEN)) {
+    Object.assign(headers, {
+      Authorization: "Bearer " + localStorage.getItem(ACCESS_TOKEN)
+    });
   }
-
-  // console.log(headers);
-
-  const defaults = { headers: headers };
-  options = Object.assign({}, defaults, options);
-
-  // console.log(defaults);
-  // console.log(options);
-
-  /*return axios
-    .request({
-      url: options.url,
-      method: options.method,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem(ACCESS_TOKEN)
-      },
-      data: options.body
-    })
-    .then(response => {
-      if (!response.data.success) {
-        return Promise.reject(response.data);
-      }
-
-      return response.data;
-    })
-    .catch(function(error) {
-      return error;
-    });*/
-
-  // console.log("options");
-  // console.log(options);
-  // return fetch(options.url, options).then(response => {
-  //   console.log("response");
-  //   console.log(response);
-  //   /*response.json().then(json => {
-  //     console.log(response);
-  //     console.log(json);
-
-  //     return json;
-  //   });*/
-
-  //   return response;
-  // });
-
-  // console.log("options");
-  // console.log(options);
-  // return fetch(options.url, options).then(response => {
-  //   console.log(response);
-  //   return response;
-  // });
 
   return axios
     .request({
       url: options.url,
       method: options.method,
       data: options.body,
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: "Bearer " + localStorage.getItem(ACCESS_TOKEN)
-      }
+      headers: headers
     })
     .then(function(response) {
       if (response.statusText !== "OK") {
@@ -143,9 +86,16 @@ export function getCurrentUser() {
   });
 }
 
-export function getUserProfile(username: string) {
+export function sendCreateGameUrl() {
   return request({
-    url: API_BASE_URL + "/users/" + username,
-    method: "GET"
+    url: API_BASE_URL + "/game/create/url",
+    method: "POST"
+  });
+}
+
+export function joinGame(id: string) {
+  return request({
+    url: API_BASE_URL + "/game/join/" + id,
+    method: "POST"
   });
 }

@@ -1,6 +1,6 @@
 import React from "react";
 
-import "./Overlay.css";
+import "../resc/css/Overlay.css";
 
 export interface IOverlayProps {
   color: string;

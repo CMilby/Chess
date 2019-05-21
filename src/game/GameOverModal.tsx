@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Container, Row, Col } from "reactstrap";
 
-import "./GameOverModal.css";
+import "../resc/css/GameOverModal.css";
 
 export interface IGameOverModalProps {
   show_modal: boolean;

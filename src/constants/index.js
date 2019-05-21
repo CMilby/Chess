@@ -1,4 +1,6 @@
 export const API_BASE_URL = ""; // http://localhost:8080
+export const WS_BASE_URL = "ws://localhost:8080/chess/websocket";
+
 export const ACCESS_TOKEN = "accessToken";
 
 export const USERNAME_MIN_LENGTH = 4;

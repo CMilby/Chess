@@ -6,7 +6,7 @@ import BoardDecorator from "./BoardDecorator";
 
 import { calculateAllMoves } from "./Game";
 
-import "./Board.css";
+import "../resc/css/Board.css";
 
 export interface IBoardProps {
   subtract_time_callback: any;

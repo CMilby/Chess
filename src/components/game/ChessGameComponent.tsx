@@ -2,14 +2,16 @@ import React, { Component } from "react";
 import { Container, Col, Row } from "reactstrap";
 import { Client } from "@stomp/stompjs";
 
-import Board from "./Board";
-import GameOverModal from "./GameOverModal";
+import Board from "../../game/Board";
+import GameOverModal from "../../game/GameOverModal";
 
-import "./ChessGame.css";
+import { subscribeToGame } from "../../util/WSUtil";
 
-export interface IChessGameProps {}
+import "../../resc/css/ChessGame.css";
 
-export interface IChessGameState {
+export interface IChessGameComponentProps {}
+
+export interface IChessGameComponentState {
   player1: {
     name: string;
     elo: number;
@@ -42,9 +44,9 @@ export interface IChessGameState {
   };
 }
 
-export default class ChessGame extends Component<
-  IChessGameProps,
-  IChessGameState
+export default class ChessGameComponent extends Component<
+  IChessGameComponentProps,
+  IChessGameComponentState
 > {
   constructor(props: any) {
     super(props);

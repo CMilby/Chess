@@ -12,7 +12,7 @@ import {
 import SignupModal from "../modal/SignupModal";
 import LoginModal from "../modal/LoginModal";
 
-import { Auth } from "../objects/Auth";
+import { Auth } from "../resc/obj/Auth";
 
 export interface IHeaderProps {
   auth: Auth;
