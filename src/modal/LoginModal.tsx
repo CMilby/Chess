@@ -1,4 +1,4 @@
-import React, { Component, FormEvent, ChangeEvent } from "react";
+import React, { Component, ChangeEvent } from "react";
 import {
   Modal,
   ModalHeader,
@@ -9,26 +9,34 @@ import {
   Row,
   Col
 } from "reactstrap";
+import { connect } from "react-redux";
+import { ThunkDispatch } from "redux-thunk";
 
-import { login } from "../util/APIUtil";
-import { ACCESS_TOKEN } from "../constants";
+import { AppState } from "../store";
+import { SystemState, SystemActionTypes } from "../store/system/types";
+import { ModalState, ModalActionTypes } from "../store/modal/types";
+import { login } from "../store/system/actions";
+import { toggle } from "../store/modal/actions";
 
-export interface ILoginModalProps {
-  is_open: boolean;
+interface ILoginModalProps {}
 
-  toggle: any;
-  open_signup_modal: any;
-
-  handle_login: any;
+interface ILoginModalStateProps {
+  system: SystemState;
+  modal: ModalState;
 }
 
-export interface ILoginModalState {
+interface ILoginModalDispatchProps {
+  login: (usernameOrEmail: string, password: string) => Promise<any>;
+  toggle: typeof toggle;
+}
+
+interface ILoginModalState {
   username_or_email: string | null;
   password: string | null;
 }
 
-export default class LoginModal extends Component<
-  ILoginModalProps,
+class LoginModal extends Component<
+  ILoginModalProps & ILoginModalStateProps & ILoginModalDispatchProps,
   ILoginModalState
 > {
   constructor(props: any) {
@@ -38,6 +46,9 @@ export default class LoginModal extends Component<
       username_or_email: null,
       password: null
     };
+
+    this.toggle = this.toggle.bind(this);
+    this.toggleSignupModal = this.toggleSignupModal.bind(this);
   }
 
   usernameEmailChanged(e: ChangeEvent<HTMLInputElement>) {
@@ -50,37 +61,35 @@ export default class LoginModal extends Component<
 
   loginUser() {
     let self = this;
-    login({
-      UsernameOrEmail: this.state.username_or_email,
-      Password: this.state.password
-    })
-      .then(function(response) {
-        self.props.handle_login(response.Message);
-        self.toggleIsOpen(false);
+
+    this.props
+      .login(
+        this.state.username_or_email as string,
+        this.state.password as string
+      )
+      .then(response => {
+        console.log("response:\n" + response);
+        self.toggle();
       })
-      .catch(function(error) {
-        console.log(error);
+      .catch(error => {
+        console.log("error:\n" + error);
       });
   }
 
   toggle() {
-    this.props.toggle(!this.props.is_open);
-  }
-
-  toggleIsOpen(open: boolean) {
-    this.props.toggle(open);
+    this.props.toggle("login", this.props.modal);
   }
 
   toggleSignupModal() {
-    this.toggleIsOpen(false);
-    this.props.open_signup_modal(true);
+    this.toggle();
+    this.props.toggle("signup", this.props.modal);
   }
 
   render() {
     return (
       <div>
-        <Modal isOpen={this.props.is_open} toggle={this.toggle.bind(this)}>
-          <ModalHeader toggle={this.toggle.bind(this)}>Sign In</ModalHeader>
+        <Modal isOpen={this.props.modal["login"]} toggle={this.toggle}>
+          <ModalHeader toggle={this.toggle}>Sign In</ModalHeader>
           <ModalBody>
             <Row>
               <Col xs="12">
@@ -105,7 +114,7 @@ export default class LoginModal extends Component<
               <Col xs="12">
                 <span>
                   Don't have an account?{" "}
-                  <a href="#" onClick={this.toggleSignupModal.bind(this)}>
+                  <a href="#" onClick={this.toggleSignupModal}>
                     Create One!
                   </a>
                 </span>
@@ -116,10 +125,7 @@ export default class LoginModal extends Component<
             <Button color="primary" onClick={this.loginUser.bind(this)}>
               Sign In
             </Button>
-            <Button
-              color="secondary"
-              onClick={this.toggleIsOpen.bind(this, false)}
-            >
+            <Button color="secondary" onClick={this.toggle.bind(this)}>
               Cancel
             </Button>
           </ModalFooter>
@@ -128,3 +134,24 @@ export default class LoginModal extends Component<
     );
   }
 }
+
+const mapStateToProps = (state: AppState) => ({
+  system: state.system,
+  modal: state.modal
+});
+
+const mapDispatchToProps = (
+  dispatch: ThunkDispatch<{}, {}, SystemActionTypes | ModalActionTypes>
+) => ({
+  login: (usernameOrEmail: string, password: string) => {
+    return dispatch(login(usernameOrEmail, password));
+  },
+  toggle: (modal: string, state: ModalState) => {
+    dispatch(toggle(modal, state));
+  }
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(LoginModal);

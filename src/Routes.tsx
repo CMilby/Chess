@@ -11,19 +11,27 @@ import Header from "./header/Header";
 import HomeComponent from "./components/HomeComponent";
 import JoinGameComponent from "./components/JoinGameComponent";
 import ChessGameComponent from "./components/game/ChessGameComponent";
+import { SystemState } from "./store/system/types";
+import { AppState } from "./store";
+import { connect } from "react-redux";
+import { getCurrentUser } from "./store/system/actions";
 
-import { Auth } from "./resc/obj/Auth";
-import { getCurrentUser } from "./util/APIUtil";
+interface IRoutesProps extends RouteComponentProps<any> {}
 
-import { ACCESS_TOKEN } from "./constants";
-
-export interface IRoutesProps extends RouteComponentProps<any> {}
-
-export interface IRoutesState {
-  auth: Auth;
+interface IRoutesStateProps {
+  system: SystemState;
 }
 
-class RoutesImpl extends Component<IRoutesProps, IRoutesState> {
+interface IRoutesDispatchProps {
+  getCurrentUser: () => Promise<any>;
+}
+
+interface IRoutesState {}
+
+class RoutesImpl extends Component<
+  IRoutesProps & IRoutesStateProps & IRoutesDispatchProps,
+  IRoutesState
+> {
   constructor(props: any) {
     super(props);
 
@@ -36,48 +44,25 @@ class RoutesImpl extends Component<IRoutesProps, IRoutesState> {
   }
 
   componentDidMount() {
-    this.loadCurrentUser();
-  }
-
-  loadCurrentUser() {
-    let self = this;
-    getCurrentUser()
+    this.props
+      .getCurrentUser()
       .then(response => {
-        self.setState({
-          auth: { is_authenticated: true, user: JSON.parse(response.Payload) }
-        });
+        console.log(response);
       })
-      .catch(function(error) {
+      .catch(error => {
         console.log(error);
       });
-  }
-
-  handleLogin(jwt: string) {
-    localStorage.setItem(ACCESS_TOKEN, jwt);
-    this.loadCurrentUser();
-  }
-
-  handleLogout(redirectTo: string = "/") {
-    localStorage.removeItem(ACCESS_TOKEN);
-    this.setState({ auth: { is_authenticated: false, user: null } });
-
-    this.props.history.push(redirectTo);
   }
 
   render() {
     return (
       <div>
-        <Header
-          auth={this.state.auth}
-          handle_login={this.handleLogin.bind(this)}
-          handle_logout={this.handleLogout.bind(this)}
-        />
+        <Header />
         <Route
           path="/"
           exact
           component={() => (
             <HomeComponent
-              auth={this.state.auth}
               history={this.props.history}
               location={this.props.location}
               match={this.props.match}
@@ -91,5 +76,14 @@ class RoutesImpl extends Component<IRoutesProps, IRoutesState> {
   }
 }
 
+const mapStateToProps = (state: AppState) => ({
+  system: state.system
+});
+
+const mapDispatchToProps = { getCurrentUser };
+
 const Routes = withRouter(RoutesImpl as any);
-export default Routes;
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Routes);

@@ -3,20 +3,22 @@ import { BrowserRouter as Router } from "react-router-dom";
 
 import Routes from "./Routes";
 
-export interface IAppProps {}
+import { AppState } from "./store";
+import { SystemState } from "./store/system/types";
+import { updateSession } from "./store/system/actions";
+import { connect } from "react-redux";
 
-export interface IAppState {}
+interface IAppProps {
+  system: SystemState;
 
-export default class App extends Component<IAppProps, IAppState> {
+  updateSession: typeof updateSession;
+}
+
+interface IAppState {}
+
+class App extends Component<IAppProps, IAppState> {
   constructor(props: any) {
     super(props);
-
-    this.state = {
-      auth: {
-        is_authenticated: false,
-        user: null
-      }
-    };
   }
 
   render() {
@@ -29,3 +31,16 @@ export default class App extends Component<IAppProps, IAppState> {
     );
   }
 }
+
+const mapStateToProps = (state: AppState) => ({
+  system: state.system
+});
+
+const mapDispatchToProps = {
+  updateSession
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App);

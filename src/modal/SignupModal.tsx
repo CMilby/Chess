@@ -9,13 +9,22 @@ import {
   Row,
   Col
 } from "reactstrap";
-import axios from "axios";
+import { connect } from "react-redux";
 
-export interface ISignupModalProps {
-  is_open: boolean;
+import { AppState } from "../store";
+import { SystemState } from "../store/system/types";
+import { ModalState } from "../store/modal/types";
+import { toggle } from "../store/modal/actions";
 
-  toggle: any;
-  open_login_modal: any;
+export interface ISignupModalProps {}
+
+export interface ISignupModalStateProps {
+  system: SystemState;
+  modal: ModalState;
+}
+
+export interface ISignupModalDispatchProps {
+  //toggle: typeof toggle;
 }
 
 export interface ISignupModalState {
@@ -24,8 +33,8 @@ export interface ISignupModalState {
   email: string | null;
 }
 
-export default class SignupModal extends Component<
-  ISignupModalProps,
+class SignupModal extends Component<
+  ISignupModalProps & ISignupModalStateProps & ISignupModalDispatchProps,
   ISignupModalState
 > {
   constructor(props: any) {
@@ -36,6 +45,10 @@ export default class SignupModal extends Component<
       email: null,
       password: null
     };
+
+    this.toggle = this.toggle.bind(this);
+    this.toggleLoginModal = this.toggleLoginModal.bind(this);
+    this.signupUser = this.signupUser.bind(this);
   }
 
   usernameChanged(e: ChangeEvent<HTMLInputElement>) {
@@ -51,38 +64,34 @@ export default class SignupModal extends Component<
   }
 
   signupUser() {
-    axios
-      .post("/user/signup", {
-        Username: this.state.username,
-        Email: this.state.email,
-        Password: this.state.password
-      })
-      .then(function(response) {
-        console.log(response);
-      })
-      .catch(function(error) {
-        console.log(error);
-      });
+    // axios
+    //   .post("/user/signup", {
+    //     Username: this.state.username,
+    //     Email: this.state.email,
+    //     Password: this.state.password
+    //   })
+    //   .then(function(response) {
+    //     console.log(response);
+    //   })
+    //   .catch(function(error) {
+    //     console.log(error);
+    //   });
   }
 
   toggle() {
-    this.props.toggle(!this.props.is_open);
-  }
-
-  toggleIsOpen(open: boolean) {
-    this.props.toggle(open);
+    // this.props.toggle("signup", this.props.modal);
   }
 
   toggleLoginModal() {
-    this.toggleIsOpen(false);
-    this.props.open_login_modal(true);
+    //  this.toggle();
+    // this.props.toggle("login", this.props.modal);
   }
 
   render() {
     return (
       <div>
-        <Modal isOpen={this.props.is_open} toggle={this.toggle.bind(this)}>
-          <ModalHeader toggle={this.toggle.bind(this)}>Signup</ModalHeader>
+        <Modal isOpen={this.props.modal["signup"]} toggle={this.toggle}>
+          <ModalHeader toggle={this.toggle}>Signup</ModalHeader>
           <ModalBody>
             <Row>
               <Col xs="12">
@@ -118,7 +127,7 @@ export default class SignupModal extends Component<
               <Col xs="12">
                 <span>
                   Already have an account?{" "}
-                  <a href="#" onClick={this.toggleLoginModal.bind(this)}>
+                  <a href="#" onClick={this.toggleLoginModal}>
                     Login
                   </a>
                 </span>
@@ -126,13 +135,10 @@ export default class SignupModal extends Component<
             </Row>
           </ModalBody>
           <ModalFooter>
-            <Button color="primary" onClick={this.signupUser.bind(this)}>
+            <Button color="primary" onClick={this.signupUser}>
               Signup
             </Button>
-            <Button
-              color="secondary"
-              onClick={this.toggleIsOpen.bind(this, false)}
-            >
+            <Button color="secondary" onClick={this.toggle}>
               Cancel
             </Button>
           </ModalFooter>
@@ -141,3 +147,17 @@ export default class SignupModal extends Component<
     );
   }
 }
+
+const mapStateToProps = (state: AppState) => ({
+  system: state.system,
+  modal: state.modal
+});
+
+const mapDispatchToProps = {
+  //toggle
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(SignupModal);

@@ -8,27 +8,40 @@ import {
   NavItem,
   NavLink
 } from "reactstrap";
+import { connect } from "react-redux";
 
 import SignupModal from "../modal/SignupModal";
 import LoginModal from "../modal/LoginModal";
 
-import { Auth } from "../resc/obj/Auth";
+import { AppState } from "../store";
+import { SystemState } from "../store/system/types";
+import { ModalState } from "../store/modal/types";
+import { logout } from "../store/system/actions";
+import { toggle } from "../store/modal/actions";
 
-export interface IHeaderProps {
-  auth: Auth;
+interface IHeaderProps {}
 
-  handle_login: any;
-  handle_logout: any;
+interface IHeaderStateProps {
+  system: SystemState;
+  modal: ModalState;
 }
 
-export interface IHeaderState {
+interface IHeaderDispatchProps {
+  logout: typeof logout;
+  toggle: typeof toggle;
+}
+
+interface IHeaderState {
   navbar_open: boolean;
 
   signup_modal_open: boolean;
   login_modal_open: boolean;
 }
 
-export default class Header extends Component<IHeaderProps, IHeaderState> {
+class Header extends Component<
+  IHeaderProps & IHeaderStateProps & IHeaderDispatchProps,
+  IHeaderState
+> {
   constructor(props: any) {
     super(props);
 
@@ -38,16 +51,27 @@ export default class Header extends Component<IHeaderProps, IHeaderState> {
       signup_modal_open: false,
       login_modal_open: false
     };
+
+    this.toggleSignupModal = this.toggleSignupModal.bind(this);
+    this.toggleLoginModal = this.toggleLoginModal.bind(this);
   }
 
-  toggleSignupModal(open: boolean) {
-    this.setState({
-      signup_modal_open: open
-    });
+  // toggleSignupModal(open: boolean) {
+  //   this.setState({
+  //     signup_modal_open: open
+  //   });
+  // }
+
+  // toggleLoginModal(open: boolean) {
+  //   this.setState({ login_modal_open: open });
+  // }
+
+  toggleSignupModal() {
+    this.props.toggle("signup", this.props.modal);
   }
 
-  toggleLoginModal(open: boolean) {
-    this.setState({ login_modal_open: open });
+  toggleLoginModal() {
+    this.props.toggle("login", this.props.modal);
   }
 
   toggleNavbar() {
@@ -56,16 +80,16 @@ export default class Header extends Component<IHeaderProps, IHeaderState> {
 
   render() {
     let navBarItems;
-    if (!this.props.auth.is_authenticated) {
+    if (!this.props.system.logged_in) {
       navBarItems = (
         <Nav className="ml-auto" navbar>
           <NavItem>
-            <NavLink href="#" onClick={this.toggleSignupModal.bind(this, true)}>
+            <NavLink href="#" onClick={this.toggleSignupModal}>
               Signup
             </NavLink>
           </NavItem>
           <NavItem>
-            <NavLink href="#" onClick={this.toggleLoginModal.bind(this, true)}>
+            <NavLink href="#" onClick={this.toggleLoginModal}>
               Login
             </NavLink>
           </NavItem>
@@ -75,12 +99,12 @@ export default class Header extends Component<IHeaderProps, IHeaderState> {
       navBarItems = (
         <Nav className="ml-auto" navbar>
           <NavItem>
-            <NavLink href="#" onClick={this.toggleSignupModal.bind(this, true)}>
+            <NavLink href="#" onClick={this.toggleSignupModal}>
               Account
             </NavLink>
           </NavItem>
           <NavItem>
-            <NavLink href="#" onClick={this.props.handle_logout}>
+            <NavLink href="#" onClick={this.props.logout}>
               Logout
             </NavLink>
           </NavItem>
@@ -91,17 +115,8 @@ export default class Header extends Component<IHeaderProps, IHeaderState> {
     return (
       <div>
         <div>
-          <LoginModal
-            is_open={this.state.login_modal_open}
-            toggle={this.toggleLoginModal.bind(this)}
-            open_signup_modal={this.toggleSignupModal.bind(this)}
-            handle_login={this.props.handle_login}
-          />
-          <SignupModal
-            is_open={this.state.signup_modal_open}
-            toggle={this.toggleSignupModal.bind(this)}
-            open_login_modal={this.toggleLoginModal.bind(this)}
-          />
+          <LoginModal />
+          <SignupModal />
         </div>
         <div>
           <Navbar color="dark" dark expand="md">
@@ -116,3 +131,18 @@ export default class Header extends Component<IHeaderProps, IHeaderState> {
     );
   }
 }
+
+const mapStateToProps = (state: AppState) => ({
+  system: state.system,
+  modal: state.modal
+});
+
+const mapDispatchToProps = {
+  logout,
+  toggle
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Header);

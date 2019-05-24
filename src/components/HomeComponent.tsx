@@ -5,8 +5,6 @@ import { Client } from "@stomp/stompjs";
 
 import CreatUrlGameModal from "../modal/CreateUrlGameModal";
 
-import { Auth } from "../resc/obj/Auth";
-
 import { sendCreateGameUrl } from "../util/APIUtil";
 import {
   subscribeToWaitForOpponent,
@@ -14,18 +12,23 @@ import {
   createClient
 } from "../util/WSUtil";
 import { ACCESS_TOKEN } from "../constants";
+import { SystemState } from "../store/system/types";
+import { AppState } from "../store";
+import { connect } from "react-redux";
 
-export interface IHomeComponentProps extends RouteComponentProps {
-  auth: Auth;
+interface IHomeComponentProps extends RouteComponentProps {}
+
+interface IHomeComponentDispatchProps {
+  system: SystemState;
 }
 
-export interface IHomeComponentState {
+interface IHomeComponentState {
   create_url_game_modal_open: boolean;
   create_url_game_game_id: string | null;
 }
 
-export default class HomeComponent extends Component<
-  IHomeComponentProps,
+class HomeComponent extends Component<
+  IHomeComponentProps & IHomeComponentDispatchProps,
   IHomeComponentState
 > {
   constructor(props: any) {
@@ -79,7 +82,7 @@ export default class HomeComponent extends Component<
   }
 
   render() {
-    if (!this.props.auth.is_authenticated) {
+    if (!this.props.system.logged_in) {
       return <div />;
     } else {
       return (
@@ -105,3 +108,9 @@ export default class HomeComponent extends Component<
     }
   }
 }
+
+const mapStateToProps = (state: AppState) => ({
+  system: state.system
+});
+
+export default connect(mapStateToProps)(HomeComponent);
